@@ -1,52 +1,22 @@
-let root = am5.Root.new("chartdiv");
-let chart = root.container.children.push(
-    am5map.MapChart.new(root, {
-        panX: "rotateX",
-        panY: "rotateY",
-        projection: am5map.geoOrthographic()
-    })
-);
 
-const backgroundSeries = chart.series.unshift(
-    am5map.MapPolygonSeries.new(root, {})
-);
+import {App} from './app.class.js';
 
-backgroundSeries.mapPolygons.template.setAll({
-    fill: 'rgb(0, 160, 224)',
-    stroke: 'rgb(0, 160, 224)'
-});
-
-backgroundSeries.data.push({
-    geometry: am5map.getGeoRectangle(90, 180, -90, -180)
-});
-
-const countryList = [];
-
-for(let key in am5geodata_data_countries2) {
-    countryList.push(am5geodata_data_countries2[key]);
-}
-
-document.querySelector('#country').innerHTML = countryList.map(el => `<option>${el.country}</option>`).join('');
-
-let polygonSeries = chart.series.push(
-    am5map.MapPolygonSeries.new(root, {
-        geoJSON: am5geodata_worldLow,
+const config = {
+    element: 'chartdiv',
+    background: 'rgb(0, 160, 224)',
+    countryStyle: {
         fill: 'rgb(255, 192, 96)',
         stroke: 'rgb(0, 160, 224)'
-    })
-);
+    }
+}
 
-polygonSeries.mapPolygons.template.setAll({
-    tooltipText: "{name}",
-    interactive: true
+const myApp = new App(config);
+myApp.setBackground(config.background);
+myApp.getCountryList().then(data => {
+    document.querySelector('#country').innerHTML = data.map(el => `<option value="${el.id}">${el.name}</option>`).join('');
 });
 
-polygonSeries.mapPolygons.template.states.create("hover", {
-    fill: am5.color(0x677935)
-});
-
-polygonSeries.mapPolygons.template.events.on("click", (e) => {
-    const dataItem = e.target.dataItem;
-    const data = dataItem.dataContext;
-    const zoomAnimation = polygonSeries.zoomToDataItem(dataItem);
+document.querySelector('#send').onclick = () => myApp.setEvent({
+    country: document.querySelector('#country').value,
+    date: document.querySelector('#date').value
 });
