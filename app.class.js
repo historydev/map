@@ -2,6 +2,7 @@ export class App {
 
     constructor(config) {
 
+        this.config = config;
         this.root = am5.Root.new(config.element);
         this.chart = this.root.container.children.push(
             am5map.MapChart.new(this.root, {
@@ -41,40 +42,81 @@ export class App {
             tooltip: this.tooltip
         });
 
-        this.polygonSeries.mapPolygons.template.states.create("click", {
-            fill: '#fff'
-        });
+    }
 
-        this.polygonSeries.mapPolygons.template.events.on("click", (e) => {
-            // const dataItem = e.target.dataItem;
-            // const data = dataItem.dataContext;
+    setEventOnCountry() {
+        return this.polygonSeries.mapPolygons.template.events.on("click", (e) => {
+            const dataItem = e.target.dataItem;
+            const data = dataItem.dataContext;
             // const zoomAnimation = polygonSeries.zoomToDataItem(dataItem);
 
             e.target._settings.clicked = !e.target._settings.clicked;
 
             if(e.target._settings.clicked) {
-                e.target.states.applyAnimate("click");
+                this.setEvent({
+                    fill: this.config.countryStyle.fillActive,
+                    country: data.id,
+                    date: prompt('Type event date:')
+                });
             } else {
-                e.target.states.applyAnimate("default");
+                this.setEvent({
+                    fill: this.config.countryStyle.fill,
+                    country: data.id,
+                    date: ''
+                });
             }
 
+        });
+    }
+
+    loadSavedData() {
+        const storage = localStorage;
+        setTimeout(() => {
+            if(storage.length) {
+                for(let key in storage) {
+                    if(key.length <= 2) {
+                        this.polygonSeries.getDataItemById(key)._settings.mapPolygon.setAll({
+                            fill: JSON.parse(storage[key]).fill,
+                            date: JSON.parse(storage[key]).date,
+                            tooltipText: JSON.parse(storage[key]).tooltipText
+                        });
+                    }
+                }
+            }
+        })
+        return storage
+    }
+
+    setEvent(config) {
+        const name = this.polygonSeries.getDataItemById(config.country).dataContext.name;
+
+        localStorage.setItem(config.country, JSON.stringify({
+            fill: config.fill || this.config.countryStyle.fillActive,
+            date: config.date,
+            tooltipText: `${name} ${config.date}`
+        }));
+
+        return this.polygonSeries.getDataItemById(config.country)._settings.mapPolygon.setAll({
+            fill: config.fill || this.config.countryStyle.fillActive,
+            date: config.date,
+            tooltipText: `${name} ${config.date}`
         });
 
     }
 
-    setEvent(config) {
-        const name = this.polygonSeries.getDataItemById(config.country)._settings.mapPolygon._settings.tooltipText;
-        this.polygonSeries.getDataItemById(config.country)._settings.mapPolygon.setAll({
-            fill: 'red',
-            date: config.date,
-            tooltipText: `${name} ${config.date}`
-        });
+    clearEvents() {
+        localStorage.clear();
+        this.polygonSeries.mapPolygons._values.map(el => el.setAll({
+            clicked: false,
+            fill: this.config.countryStyle.fill,
+            tooltipText: '{name}'
+        }));
     }
 
     async getCountryList() {
         return new Promise((resolve, reject) => {
 
-            if(this.polygonSeries.allChildren()) return setTimeout(() => resolve(this.polygonSeries.allChildren(), 1000));
+            if(this.polygonSeries.allChildren()) return setTimeout(() => resolve(this.polygonSeries.allChildren()));
             return reject(new Error('In polygonSeries'));
 
         })
