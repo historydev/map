@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Authenticate</title>
+    <link rel="stylesheet" href="./css/index.css">
+    <link rel="stylesheet" href="./css/auth.css">
+</head>
+<body>
+    <div class="container">
+        <div id="register" class="form">
+            <div class="title">Регистрация</div>
+            <input type="text" placeholder="first name" name="name" required>
+            <input type="date" placeholder="Date of birth" name="date" required>
+            <input type="email" placeholder="E-mail" name="email" required>
+            <input type="tel" placeholder="Phone number" name="phone" required>
+            <button id="submitReg">Начать</button>
+            <a href="#" class="changeForm">Войти</a>
+        </div>
+        <div id="auth" class="form">
+            <div class="title">Авторизация</div>
+            <input type="email" placeholder="E-mail" name="email" required>
+            <input type="password" placeholder="Password" name="password" required>
+            <button type="submit" id="submitAuth">Войти</button>
+            <a href="#" class="changeForm">Регистрация</a>
+        </div>
+    </div>
+    <script src="./js/auth.js"></script>
+</body>
+</html>
