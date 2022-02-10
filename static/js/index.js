@@ -4,20 +4,13 @@ import {App} from './app.class.js';
 // Air-datepicker => google.com
 $('.date').datepicker({
     multipleDates: 2,
-    inline: true
+    inline: true,
+    range: true
 });
 
 // Handler for dates
 const controls = document.querySelector('.controls');
 const modal = document.querySelector('.modal');
-
-const setDate = (el) => {
-    const data = el.querySelector('.date').value.split(',');
-    el.querySelector('.dates').textContent = `${data[0] ? `Начало: ${data[0]}` : ''} ${data[1] ? ` | Конец: ${data[1]}` : ''}`;
-}
-
-controls.querySelector('.datepicker-inline').onclick = () => setDate(controls);
-modal.querySelector('.datepicker-inline').onclick = () => setDate(modal);
 
 // Modal close button
 modal.querySelector('.close').onclick = () => modal.style.display = 'none';
@@ -48,9 +41,9 @@ const myApp = new App(config);
 myApp.setBackground(config.background);
 
 // Set list country
-myApp.getCountryList().then(data => {
-    document.querySelector('#country').innerHTML = data.map(el => `<option value="${el.id}">${el.name}</option>`).join('');
-});
+const countryList = myApp.getCountryList();
+countryList.then(data => document.querySelector('#country').innerHTML = data.map(el => `<option value="${el.id}">${el.name}</option>`).join('')).catch(console.log);
+//countryList.then(data => console.log(data))
 
 // Load saved data
 fetch('/getEvents', {
@@ -62,25 +55,48 @@ fetch('/getEvents', {
         email: localStorage.getItem('email')
     })
 }).then(data => data.json())
-    .then(data => data.events.forEach(el => myApp.loadSavedData(el)));
+    .then(data => data.events.forEach(el => myApp.loadSavedData(el)))
+    .catch(console.log);
 
 // Set click handler for country on map
-myApp.setEventOnCountry(modal, (fill, country) => {
+myApp.setEventOnCountry(modal, (fill, country, name) => {
     return updateDate = (date) => myApp.setEvent({
         fill: fill,
         country: country,
+        fullName: name,
         date: date
     });
 });
 
+document.querySelector('#country').onclick = (e) => {
+    const name = document.querySelector('#country').options[document.querySelector('#country').selectedIndex].textContent;
+    document.querySelector('.event .title').innerText = name;
+    //myApp.addEventArr.filter(el => console.log(el.name === name));
+    document.querySelector('.event .dateslist').innerHTML =
+        myApp.addEventArr.filter(el => el.fullName === name).map((el, i) => {
+            return `<div class="dateItem">${el.date.replace(',', ' - ')}<button class="removeDate" title="remove">X</button><button class="removeDate" title="remove">X</button></div>`
+        }).join('');
+    const centroid = myApp.polygonSeries.getDataItemById(e.target.value)._settings.mapPolygon.geoCentroid();
+    if (centroid) {
+        myApp.chart.animate({ key: "rotationX", to: -centroid.longitude, duration: 1500, easing: am5.ease.inOut(am5.ease.cubic) });
+        myApp.chart.animate({ key: "rotationY", to: -centroid.latitude, duration: 1500, easing: am5.ease.inOut(am5.ease.cubic) });
+    }
+}
+
 // Get event inputs
-document.querySelector('#send').onclick = () => myApp.setEvent({
-    country: document.querySelector('#country').value,
-    date: document.querySelector('#date').value
-});
+document.querySelector('#send').onclick = () => {
+    if(document.querySelector('#date').value) {
+        myApp.setEvent({
+            country: document.querySelector('#country').value,
+            date: document.querySelector('#date').value,
+            fullName: document.querySelector('#country').options[document.querySelector('#country').selectedIndex].textContent
+        })
+    }
+};
 
 // Set clear events button
-document.querySelector('#clear').onclick = () => myApp.clearEvents();
+//document.querySelector('#clear').onclick = () => myApp.clearEvents();
+
 // Set clear events button
 document.querySelector('#quit').onclick = () => {
     localStorage.clear();

@@ -8,14 +8,12 @@
     <title>Welcome</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/air-datepicker/2.2.3/css/datepicker.min.css">
     <link rel="stylesheet" href="css/index.css">
-    <script src="https://cdn.jsdelivr.net/npm/d3-array@3"></script>
-    <script src="https://cdn.jsdelivr.net/npm/d3-geo@3"></script>
-    <script src="https://cdn.jsdelivr.net/npm/d3-geo-projection@4"></script>
     <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
     <script src="https://cdn.amcharts.com/lib/5/map.js"></script>
     <script src="https://www.amcharts.com/lib/5/geodata/worldLow.js"></script>
     <script src="https://cdn.amcharts.com/lib/5/geodata/data/countries.js"></script>
     <script src="https://cdn.amcharts.com/lib/5/geodata/data/countries2.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/air-datepicker/2.2.3/js/datepicker.min.js"></script>
 </head>
@@ -34,11 +32,14 @@
         </div>
 
         <div class="controls">
-            <div class="dates"></div>
+            <div class="event">
+                <div class="title">Afghanistan</div>
+                <div class="dateslist"></div>
+            </div>
             <input type="text" id="date" class="date" placeholder="Select date">
             <select name="" id="country"></select>
-            <button id="send">Установить событие</button>
-            <button id="clear">Очистить события</button>
+            <button id="send">Добавить путешествие</button>
+            <!--            <button id="clear">Очистить путешествия</button>-->
             <button id="quit">Выйти из аккаунта</button>
         </div>
     </div>

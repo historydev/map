@@ -4,11 +4,18 @@ export class App {
 
         this.config = config;
         this.root = am5.Root.new(config.element);
+
+        this.root.setThemes([
+            am5themes_Animated.new(this.root)
+        ]);
+
         this.chart = this.root.container.children.push(
             am5map.MapChart.new(this.root, {
                 panX: "rotateX",
                 panY: "rotateY",
-                projection: am5map.geoOrthographic()
+                projection: am5map.geoOrthographic(),
+                maxZoomLevel: 1,
+                interactive: true
             })
         );
 
@@ -39,36 +46,50 @@ export class App {
         this.polygonSeries.mapPolygons.template.setAll({
             tooltipText: "{name}",
             clicked: false,
-            tooltip: this.tooltip
+            tooltip: this.tooltip,
+            interactive: true
         });
+
+        this.chart.appear(1000, 100);
+
+        this.addEventArr = [];
 
     }
 
     setEventOnCountry(modal, f) {
-        this.polygonSeries.mapPolygons.template.events.on("click", (e) => {
-            const dataItem = e.target.dataItem;
-            const data = dataItem.dataContext;
-            // const zoomAnimation = polygonSeries.zoomToDataItem(dataItem);
+            this.polygonSeries.mapPolygons.template.events.on("click", (e) => {
+                const dataItem = e.target.dataItem;
+                const data = dataItem.dataContext;
+                //const zoomAnimation = this.polygonSeries.zoomToDataItem(dataItem);
 
-            e.target._settings.clicked = !e.target._settings.clicked;
+                this.chart.zoomToGeoPoint({ longitude: 10, latitude: 52 }, 1, false);
 
-            if(e.target._settings.clicked) {
-                modal.style.display = 'flex';
-                f(this.config.countryStyle.fillActive, data.id);
-            } else {
-                this.setEvent({
-                    fill: this.config.countryStyle.fill,
-                    country: data.id,
-                    date: ''
-                });
-            }
+                e.target._settings.clicked = !e.target._settings.clicked;
 
-        });
+                if(e.target._settings.clicked) {
+                    modal.style.display = 'flex';
+                    const centroid = e.target.geoCentroid();
+                    if (centroid) {
+                        this.chart.animate({ key: "rotationX", to: -centroid.longitude, duration: 1500, easing: am5.ease.inOut(am5.ease.cubic) });
+                        this.chart.animate({ key: "rotationY", to: -centroid.latitude, duration: 1500, easing: am5.ease.inOut(am5.ease.cubic) });
+                    }
+                    f(this.config.countryStyle.fillActive, data.id, data.name);
+                } else {
+                    this.setEvent({
+                        fill: this.config.countryStyle.fill,
+                        country: data.id,
+                        fullName: '',
+                        date: ''
+                    });
+                }
+
+            });
     }
 
     loadSavedData(data) {
         setTimeout(() => {
             if(data) {
+                this.addEvent(data);
                 this.polygonSeries.getDataItemById(data.name)._settings.mapPolygon.setAll({
                     fill: data.fill,
                     date: data.date,
@@ -79,14 +100,46 @@ export class App {
         return data
     }
 
+    addEvent(data) {
+        const event = document.querySelector('.event');
+        if(data) {
+            if(!this.addEventArr.find(el => el.date === data.date)) this.addEventArr.push(data);
+            event.querySelector('.title').innerText = data.fullName;
+            event.querySelector('.dateslist').innerHTML =
+                this.addEventArr.filter(el => el.name === data.name).map((el, i) => {
+                    return `<div class="dateItem">${el.date.replace(',', ' - ')}<button class="removeDate" title="remove">X</button></div>`
+                }).join('');
+            event.querySelectorAll('.dateItem .removeDate').forEach((el, i) => {
+                this.removeEvent(data, i);
+            });
+        }
+    }
+
+    removeEvent(event, i) {
+        document.querySelectorAll('.event .dateItem .removeDate')[i].onclick = () => {
+            const index = this.addEventArr.findIndex(ev => ev.date === event.date);
+            if(index >= 0) {
+                this.addEventArr.splice(index, 1);
+                fetch('/removeEvent', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: localStorage.getItem('email'),
+                        event: event
+                    })
+                }).then(data => data.json()).then(data => {
+                    if(data.events.length) return data.events.forEach(el => this.loadSavedData(el));
+                    document.querySelector('.event .dateslist').innerHTML = '';
+                }).catch(console.log);
+                //window.location.reload()
+            }
+        }
+    }
+
     setEvent(config) {
         const name = this.polygonSeries.getDataItemById(config.country).dataContext.name;
-
-        // localStorage.setItem(config.country, JSON.stringify({
-        //     fill: config.fill || this.config.countryStyle.fillActive,
-        //     date: config.date,
-        //     tooltipText: `${name} ${config.date}`
-        // }));
 
         fetch('/setEvent', {
             method: 'POST',
@@ -97,18 +150,26 @@ export class App {
                 email: localStorage.getItem('email'),
                 event: {
                     name: config.country,
+                    fullName: config.fullName,
                     fill: config.fill || this.config.countryStyle.fillActive,
                     date: config.date,
-                    tooltipText: `${name} ${config.date}`
+                    tooltipText: `${name}`
                 }
             })
         }).then(data => data.json())
-            .then(data => data.events.forEach(el => this.loadSavedData(el)));
+            .then(data => data.events.forEach(el => this.loadSavedData(el)))
+            .catch(console.log);
+
+        const centroid = this.polygonSeries.getDataItemById(config.country)._settings.mapPolygon.geoCentroid();
+        if (centroid) {
+            this.chart.animate({ key: "rotationX", to: -centroid.longitude, duration: 1500, easing: am5.ease.inOut(am5.ease.cubic) });
+            this.chart.animate({ key: "rotationY", to: -centroid.latitude, duration: 1500, easing: am5.ease.inOut(am5.ease.cubic) });
+        }
 
         return this.polygonSeries.getDataItemById(config.country)._settings.mapPolygon.setAll({
             fill: config.fill || this.config.countryStyle.fillActive,
             date: config.date,
-            tooltipText: `${name} ${config.date}`
+            tooltipText: `${name}`
         });
 
     }
@@ -130,7 +191,7 @@ export class App {
         }));
     }
 
-    async getCountryList() {
+    getCountryList() {
         return new Promise((resolve, reject) => {
 
             if(this.polygonSeries.allChildren()) return setTimeout(() => resolve(this.polygonSeries.allChildren()));

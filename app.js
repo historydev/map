@@ -53,7 +53,8 @@ app.post('/auth', (req, res) => {
 app.post('/setEvent', (req, res) => {
     const {email, event} = req.body;
     if(email && event) {
-        const events = users.forEach(user => user.email === email ? user.events.push(event):user);
+        users.forEach(user => user.email === email ? user.events.push(event):user);
+        const events = users.find(user => user.email === email).events;
         res.send({
             events: events
         });
@@ -62,10 +63,22 @@ app.post('/setEvent', (req, res) => {
 
 app.post('/getEvents', (req, res) => {
     const {email} = req.body;
-    const user = users.find(user => user.email === email)
+    const user = users.find(user => user.email === email);
     if(user) {
         const events = user.events;
-        console.log(events);
+        res.send({
+            events: events
+        });
+    }
+});
+
+app.post('/removeEvent', (req, res) => {
+    const {event, email} = req.body;
+    const user = users.find(user => user.email === email);
+    if(email && event) {
+        const events = user.events
+        const index = user.events.findIndex(el => el.date === event.date);
+        if(index >= 0) user.events.splice(index, 1);
         res.send({
             events: events
         });
