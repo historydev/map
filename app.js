@@ -110,10 +110,9 @@ app.post('/updateEvent', (req, res) => {
     const {event, email, date} = req.body;
     const user = users.find(user => user.email === email);
     if(email && event && date) {
-        const events = user.events
         const index = user.events.findIndex(el => el.name === event.name && el.date === event.date);
         if(index >= 0) user.events[index].date = date;
-        console.log(events);
+        const events = user.events.filter(el => el.name === event.name);
         res.send({
             events: events
         });
