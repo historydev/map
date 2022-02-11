@@ -160,6 +160,7 @@ select {
     justify-content: center;
     align-items: flex-start;
     flex-wrap: wrap;
+    padding-bottom: 10px;
 }
 
 .event .dateItem {
@@ -167,7 +168,7 @@ select {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    font-size: 13px;
+    font-size: 11px;
 }
 
 .event .title {
@@ -181,13 +182,27 @@ select {
     margin-bottom: 10px;
 }
 
+.event .buttons {
+    display: flex;
+    justify-content: center;
+}
+
 .event button {
-    width: 20px;
-    height: 20px;
+    width: 15px;
+    height: 15px;
     display: flex;
     justify-content: center;
     align-items: center;
     background: none;
     color: rgb(181, 38, 38);
+    font-size: 11px;
     margin: 0;
+}
+
+.event .updateDate {
+    color: rgb(0, 160, 224);
+}
+
+#update {
+    display: none;
 }

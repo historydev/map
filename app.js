@@ -2,21 +2,31 @@ const express = require('express');
 const app = express();
 //const cors = require('cors');
 const bp = require('body-parser');
+const path = require('path');
 
 app.use(bp.json());
 //app.use(cors());
-app.use(express.static('static'));
+app.use(express.static('static'))
 
 const users = [
     {
+        id: '1',
         email: '123',
         password: '123',
-        events: []
+        events: [],
+        isAuth: false
     }
 ];
 
 app.get('/', (req, res) => {
-    res.sendFile('./index.html');
+   res.sendFile('./auth.html');
+});
+
+app.get('/user/:id', (req, res) => {
+    const {id} = req.params;
+    const userID = users.find(el => `id${el.id}` === id && el.isAuth);
+    if(userID) return res.sendFile('./index.html', {root: __dirname + '/static'});
+    res.redirect('/auth');
 });
 
 app.get('/auth', (req, res) => {
@@ -25,7 +35,9 @@ app.get('/auth', (req, res) => {
 
 app.post('/register', (req, res) => {
     const pass = Math.floor(Math.random() * 2000);
+    const userID = users.length+1;
     users.push({
+        id: userID,
         ...req.body,
         events: [],
         password: pass.toString()
@@ -37,8 +49,11 @@ app.post('/register', (req, res) => {
 
 app.post('/auth', (req, res) => {
     const {email, password} = req.body;
-    if(users.find(el => el.email === email)) {
-        if(users.find(el => el.password === password)) {}
+    const user = users.find(el => el.email === email);
+    if(user) {
+        if(user.password === password) {
+            user.isAuth = true;
+        }
         else {
             return console.log('Incorrect pass');
         }
@@ -46,7 +61,9 @@ app.post('/auth', (req, res) => {
         return console.log('Incorrect email');
     }
     res.send({
-        email: email
+        email: email,
+        id: user.id,
+        isAuth: user.isAuth
     });
 });
 
@@ -66,6 +83,20 @@ app.post('/getEvents', (req, res) => {
     const user = users.find(user => user.email === email);
     if(user) {
         const events = user.events;
+        res.send({
+            events: events
+        });
+    }
+});
+
+app.post('/updateEvent', (req, res) => {
+    const {event, email, date} = req.body;
+    const user = users.find(user => user.email === email);
+    if(email && event && date) {
+        const events = user.events
+        const index = user.events.findIndex(el => el.date === event.date);
+        if(index >= 0) user.events[index].date = date;
+        console.log(events);
         res.send({
             events: events
         });

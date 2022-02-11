@@ -74,7 +74,12 @@ document.querySelector('#country').onclick = (e) => {
     //myApp.addEventArr.filter(el => console.log(el.name === name));
     document.querySelector('.event .dateslist').innerHTML =
         myApp.addEventArr.filter(el => el.fullName === name).map((el, i) => {
-            return `<div class="dateItem">${el.date.replace(',', ' - ')}<button class="removeDate" title="remove">X</button><button class="removeDate" title="remove">X</button></div>`
+            return `<div class="dateItem">${el.date.replace(',', ' - ')}
+                       <div class="buttons">
+                            <button class="updateDate" title="update"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button class="removeDate" title="remove">X</button>
+                        </div>
+                    </div>`
         }).join('');
     const centroid = myApp.polygonSeries.getDataItemById(e.target.value)._settings.mapPolygon.geoCentroid();
     if (centroid) {
@@ -90,7 +95,7 @@ document.querySelector('#send').onclick = () => {
             country: document.querySelector('#country').value,
             date: document.querySelector('#date').value,
             fullName: document.querySelector('#country').options[document.querySelector('#country').selectedIndex].textContent
-        })
+        });
     }
 };
 

@@ -42,6 +42,6 @@ document.querySelector('#submitAuth').onclick = () => {
         password: inputs[1]
     }, '/auth').then(data => {
         localStorage.setItem('email', data.email);
-        window.location.href = '/';
+        window.location.href = `/user/id${data.id}`;
     });
 }

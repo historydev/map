@@ -107,11 +107,59 @@ export class App {
             event.querySelector('.title').innerText = data.fullName;
             event.querySelector('.dateslist').innerHTML =
                 this.addEventArr.filter(el => el.name === data.name).map((el, i) => {
-                    return `<div class="dateItem">${el.date.replace(',', ' - ')}<button class="removeDate" title="remove">X</button></div>`
+                    return `<div class="dateItem">${el.date.replace(',', ' - ')}
+                                <div class="buttons">
+                                    <button class="updateDate" title="update"><i class="fa-solid fa-pen-to-square"></i></button>
+                                    <button class="removeDate" title="remove">X</button>
+                                </div>
+                            </div>
+                            `
                 }).join('');
             event.querySelectorAll('.dateItem .removeDate').forEach((el, i) => {
                 this.removeEvent(data, i);
             });
+            event.querySelectorAll('.dateItem .updateDate').forEach((el, i) => {
+                this.updateEvent(data, i);
+            });
+        }
+        return data
+    }
+
+    updateEvent(event, i) {
+        document.querySelectorAll('.event .dateItem .updateDate')[i].onclick = () => {
+            const selectedItem = document.querySelectorAll('.event .dateItem')[i];
+            const send = document.querySelector('#send');
+            const update = document.querySelector('#update');
+            send.style.display = 'none';
+            update.style.display = 'block';
+            selectedItem.style.background = 'rgba(0,0,0, .1)';
+            document.querySelector('#update').onclick = () => {
+                const index = this.addEventArr.findIndex(ev => ev.date === event.date);
+                const date = document.querySelector('#date').value;
+                if(index >= 0) {
+                    this.addEventArr[i] = {
+                        ...this.addEventArr[i],
+                        date: date
+                    };
+                    fetch('/updateEvent', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            email: localStorage.getItem('email'),
+                            event: event,
+                            date: date
+                        })
+                    }).then(data => data.json()).then(data => {
+                        if(data.events.length) return data.events.forEach(el => this.loadSavedData(el));
+                        document.querySelector('.event .dateslist').innerHTML = '';
+                    }).catch(console.log);
+                    send.style.display = 'block';
+                    update.style.display = 'none';
+                    selectedItem.style.background = 'none';
+                }
+            }
         }
     }
 
