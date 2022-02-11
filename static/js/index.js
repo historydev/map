@@ -9,7 +9,6 @@ $('.date').datepicker({
 });
 
 // Handler for dates
-const controls = document.querySelector('.controls');
 const modal = document.querySelector('.modal');
 
 // Modal close button
@@ -41,60 +40,81 @@ const myApp = new App(config);
 myApp.setBackground(config.background);
 
 // Set list country
+const countryEl = document.querySelector('#country');
 const countryList = myApp.getCountryList();
-countryList.then(data => document.querySelector('#country').innerHTML = data.map(el => `<option value="${el.id}">${el.name}</option>`).join('')).catch(console.log);
+countryList.then(data => countryEl.innerHTML = data.map(el => `<option value="${el.id}">${el.name}</option>`).join('')).catch(console.log);
 //countryList.then(data => console.log(data))
 
 // Load saved data
+fetch('/getCountryEvents', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        email: localStorage.getItem('email'),
+        name: 'AF'
+    })
+}).then(data => data.json())
+    .then(data => myApp.loadSavedData(data.events))
+    .catch(console.log);
+
 fetch('/getEvents', {
     method: 'POST',
     headers: {
         'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-        email: localStorage.getItem('email')
+        email: localStorage.getItem('email'),
+        name: 'AF'
     })
 }).then(data => data.json())
-    .then(data => data.events.forEach(el => myApp.loadSavedData(el)))
-    .catch(console.log);
+    .then(data => data.events.forEach(el => {
+        myApp.polygonSeries.getDataItemById(el.name)._settings.mapPolygon.setAll({
+            fill: myApp.config.countryStyle.fillActive,
+        });
+    }));
 
 // Set click handler for country on map
 myApp.setEventOnCountry(modal, (fill, country, name) => {
-    return updateDate = (date) => myApp.setEvent({
-        fill: fill,
-        country: country,
-        fullName: name,
-        date: date
-    });
-});
-
-document.querySelector('#country').onclick = (e) => {
-    const name = document.querySelector('#country').options[document.querySelector('#country').selectedIndex].textContent;
-    document.querySelector('.event .title').innerText = name;
-    //myApp.addEventArr.filter(el => console.log(el.name === name));
-    document.querySelector('.event .dateslist').innerHTML =
-        myApp.addEventArr.filter(el => el.fullName === name).map((el, i) => {
-            return `<div class="dateItem">${el.date.replace(',', ' - ')}
-                       <div class="buttons">
-                            <button class="updateDate" title="update"><i class="fa-solid fa-pen-to-square"></i></button>
-                            <button class="removeDate" title="remove">X</button>
-                        </div>
-                    </div>`
-        }).join('');
-    const centroid = myApp.polygonSeries.getDataItemById(e.target.value)._settings.mapPolygon.geoCentroid();
-    if (centroid) {
-        myApp.chart.animate({ key: "rotationX", to: -centroid.longitude, duration: 1500, easing: am5.ease.inOut(am5.ease.cubic) });
-        myApp.chart.animate({ key: "rotationY", to: -centroid.latitude, duration: 1500, easing: am5.ease.inOut(am5.ease.cubic) });
+    return updateDate = (date) => {
+        myApp.setEvent({
+            fill: fill,
+            country: country,
+            fullName: name,
+            date: date
+        });
+        return date
     }
+}, countryEl);
+
+countryEl.onclick = (e) => {
+    const name = countryEl.options[countryEl.selectedIndex].textContent;
+    const value = countryEl.options[countryEl.selectedIndex].value;
+
+    fetch('/getCountryEvents', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            email: localStorage.getItem('email'),
+            name: value
+        })
+    }).then(data => data.json())
+        .then(data => myApp.loadSavedData(data.events))
+        .catch(console.log);
+
+    myApp.centerMap(e.target.value);
 }
 
 // Get event inputs
 document.querySelector('#send').onclick = () => {
     if(document.querySelector('#date').value) {
         myApp.setEvent({
-            country: document.querySelector('#country').value,
+            country: countryEl.value,
             date: document.querySelector('#date').value,
-            fullName: document.querySelector('#country').options[document.querySelector('#country').selectedIndex].textContent
+            fullName: countryEl.options[countryEl.selectedIndex].textContent
         });
     }
 };

@@ -52,138 +52,137 @@ export class App {
 
         this.chart.appear(1000, 100);
 
-        this.addEventArr = [];
+    }
 
+    centerMap(item) {
+        const centroid = this.polygonSeries.getDataItemById(item)._settings.mapPolygon.geoCentroid();
+        if (centroid) {
+            this.chart.animate({
+                key: "rotationX",
+                to: -centroid.longitude,
+                duration: 1500,
+                easing: am5.ease.inOut(am5.ease.cubic)
+            });
+            this.chart.animate({
+                key: "rotationY",
+                to: -centroid.latitude,
+                duration: 1500,
+                easing: am5.ease.inOut(am5.ease.cubic)
+            });
+        }
     }
 
     setEventOnCountry(modal, f) {
-            this.polygonSeries.mapPolygons.template.events.on("click", (e) => {
-                const dataItem = e.target.dataItem;
-                const data = dataItem.dataContext;
-                //const zoomAnimation = this.polygonSeries.zoomToDataItem(dataItem);
+        this.polygonSeries.mapPolygons.template.events.on("click", (e) => {
+            const dataItem = e.target.dataItem;
+            const data = dataItem.dataContext;
+            //const zoomAnimation = this.polygonSeries.zoomToDataItem(dataItem);
 
-                this.chart.zoomToGeoPoint({ longitude: 10, latitude: 52 }, 1, false);
+            this.chart.zoomToGeoPoint({ longitude: 10, latitude: 52 }, 1, false);
 
-                e.target._settings.clicked = !e.target._settings.clicked;
+            fetch('/getCountryEvents', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: localStorage.getItem('email'),
+                    name: data.id
+                })
+            }).then(data => data.json())
+                .then(res => {
+                    this.loadSavedData(res.events)
+                })
+                .catch(console.log);
 
-                if(e.target._settings.clicked) {
-                    modal.style.display = 'flex';
-                    const centroid = e.target.geoCentroid();
-                    if (centroid) {
-                        this.chart.animate({ key: "rotationX", to: -centroid.longitude, duration: 1500, easing: am5.ease.inOut(am5.ease.cubic) });
-                        this.chart.animate({ key: "rotationY", to: -centroid.latitude, duration: 1500, easing: am5.ease.inOut(am5.ease.cubic) });
-                    }
-                    f(this.config.countryStyle.fillActive, data.id, data.name);
-                } else {
-                    this.setEvent({
-                        fill: this.config.countryStyle.fill,
-                        country: data.id,
-                        fullName: '',
-                        date: ''
-                    });
-                }
+            [...document.querySelector('#country').options].find(el => el.value === data.id).selected = true;
+            document.querySelector('.event').querySelector('.title').innerText = data.name;
 
-            });
+            this.centerMap(data.id);
+            f(this.config.countryStyle.fillActive, data.id, data.name);
+
+        });
     }
 
     loadSavedData(data) {
+        const event = document.querySelector('.event');
         setTimeout(() => {
-            if(data) {
-                this.addEvent(data);
-                this.polygonSeries.getDataItemById(data.name)._settings.mapPolygon.setAll({
-                    fill: data.fill,
-                    date: data.date,
-                    tooltipText: data.tooltipText
+            if(data.length) {
+
+                console.log(data);
+
+                event.querySelector('.title').innerText = data[0].fullName;
+                event.querySelector('.dateslist').innerHTML =
+                    data.map((el, i) => {
+                        return `<div class="dateItem">${el.date.replace(',', ' - ')}
+                                    <div class="buttons">
+                                        <button class="updateDate" title="update"><i class="fa-solid fa-pen-to-square"></i></button>
+                                        <button class="removeDate" title="remove">X</button>
+                                    </div>
+                                </div>`
+                    }).join('');
+
+                data.forEach((el, index) => document.querySelectorAll('.event .dateItem .removeDate')[index].onclick = () => this.removeEvent(el));
+                data.forEach((el, index) => document.querySelectorAll('.event .dateItem .updateDate')[index].onclick = () => {
+                    const item = document.querySelectorAll('.event .dateItem')[index];
+                    document.querySelector('#update').style.display = 'block';
+                    document.querySelector('#send').style.display = 'none';
+                    item.style.background = 'rgba(0,0,0, .1)';
+                    this.updateEvent(el, item);
                 });
+
+                this.polygonSeries.getDataItemById(data[0].name)._settings.mapPolygon.setAll({
+                    fill: data[0].fill,
+                    date: data[0].date,
+                    tooltipText: data[0].tooltipText
+                });
+
+            } else {
+                event.querySelector('.dateslist').innerHTML = '';
             }
         })
         return data
     }
 
-    addEvent(data) {
-        const event = document.querySelector('.event');
-        if(data) {
-            if(!this.addEventArr.find(el => el.date === data.date)) this.addEventArr.push(data);
-            event.querySelector('.title').innerText = data.fullName;
-            event.querySelector('.dateslist').innerHTML =
-                this.addEventArr.filter(el => el.name === data.name).map((el, i) => {
-                    return `<div class="dateItem">${el.date.replace(',', ' - ')}
-                                <div class="buttons">
-                                    <button class="updateDate" title="update"><i class="fa-solid fa-pen-to-square"></i></button>
-                                    <button class="removeDate" title="remove">X</button>
-                                </div>
-                            </div>
-                            `
-                }).join('');
-            event.querySelectorAll('.dateItem .removeDate').forEach((el, i) => {
-                this.removeEvent(data, i);
-            });
-            event.querySelectorAll('.dateItem .updateDate').forEach((el, i) => {
-                this.updateEvent(data, i);
-            });
-        }
-        return data
-    }
-
-    updateEvent(event, i) {
-        document.querySelectorAll('.event .dateItem .updateDate')[i].onclick = () => {
-            const selectedItem = document.querySelectorAll('.event .dateItem')[i];
-            const send = document.querySelector('#send');
-            const update = document.querySelector('#update');
-            send.style.display = 'none';
-            update.style.display = 'block';
-            selectedItem.style.background = 'rgba(0,0,0, .1)';
-            document.querySelector('#update').onclick = () => {
-                const index = this.addEventArr.findIndex(ev => ev.date === event.date);
-                const date = document.querySelector('#date').value;
-                if(index >= 0) {
-                    this.addEventArr[i] = {
-                        ...this.addEventArr[i],
-                        date: date
-                    };
-                    fetch('/updateEvent', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            email: localStorage.getItem('email'),
-                            event: event,
-                            date: date
-                        })
-                    }).then(data => data.json()).then(data => {
-                        if(data.events.length) return data.events.forEach(el => this.loadSavedData(el));
-                        document.querySelector('.event .dateslist').innerHTML = '';
-                    }).catch(console.log);
-                    send.style.display = 'block';
-                    update.style.display = 'none';
-                    selectedItem.style.background = 'none';
-                }
-            }
+    updateEvent(event, item) {
+        document.querySelector('#update').onclick = () => {
+            fetch('/updateEvent', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: localStorage.getItem('email'),
+                    event: event,
+                    date: document.querySelector('#date').value
+                })
+            }).then(data => data.json()).then(data => {
+                this.loadSavedData(data.events);
+                document.querySelector('#update').style.display = 'none';
+                document.querySelector('#send').style.display = 'block';
+                item.style.background = 'none';
+            }).catch(console.log);
         }
     }
 
-    removeEvent(event, i) {
-        document.querySelectorAll('.event .dateItem .removeDate')[i].onclick = () => {
-            const index = this.addEventArr.findIndex(ev => ev.date === event.date);
-            if(index >= 0) {
-                this.addEventArr.splice(index, 1);
-                fetch('/removeEvent', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        email: localStorage.getItem('email'),
-                        event: event
-                    })
-                }).then(data => data.json()).then(data => {
-                    if(data.events.length) return data.events.forEach(el => this.loadSavedData(el));
-                    document.querySelector('.event .dateslist').innerHTML = '';
-                }).catch(console.log);
-                //window.location.reload()
+    removeEvent(event) {
+        fetch('/removeEvent', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: localStorage.getItem('email'),
+                event: event
+            })
+        }).then(data => data.json()).then(data => {
+            if(!data.length) {
+                this.polygonSeries.getDataItemById(event.name)._settings.mapPolygon.setAll({
+                    fill: this.config.countryStyle.fill,
+                })
             }
-        }
+            this.loadSavedData(data.events)
+        }).catch(console.log);
     }
 
     setEvent(config) {
@@ -205,14 +204,10 @@ export class App {
                 }
             })
         }).then(data => data.json())
-            .then(data => data.events.forEach(el => this.loadSavedData(el)))
+            .then(data => this.loadSavedData(data.events))
             .catch(console.log);
 
-        const centroid = this.polygonSeries.getDataItemById(config.country)._settings.mapPolygon.geoCentroid();
-        if (centroid) {
-            this.chart.animate({ key: "rotationX", to: -centroid.longitude, duration: 1500, easing: am5.ease.inOut(am5.ease.cubic) });
-            this.chart.animate({ key: "rotationY", to: -centroid.latitude, duration: 1500, easing: am5.ease.inOut(am5.ease.cubic) });
-        }
+        this.centerMap(config.country);
 
         return this.polygonSeries.getDataItemById(config.country)._settings.mapPolygon.setAll({
             fill: config.fill || this.config.countryStyle.fillActive,

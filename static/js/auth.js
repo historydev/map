@@ -27,21 +27,34 @@ const hook = async(data, url) => {
 
 document.querySelector('#submitReg').onclick = () => {
     const inputs = [...reg.querySelectorAll('input')].map(el => el.value);
-    hook({
-        name: inputs[0],
-        date: inputs[1],
-        email: inputs[2],
-        phone: inputs[3]
-    }, '/register').then(res => alert(`Your password: ${res.password}`));
+    if(inputs.every(el => el.length)) {
+        return hook({
+            name: inputs[0],
+            date: inputs[1],
+            email: inputs[2],
+            phone: inputs[3]
+        }, '/register').then(res => {
+            alert(`Your password: ${res.password}`);
+            window.location.href = `/auth`;
+        });
+    }
+    alert('Не все поля заполнены!');
+    window.location.href = `/auth`;
 }
 
 document.querySelector('#submitAuth').onclick = () => {
     const inputs = [...auth.querySelectorAll('input')].map(el => el.value);
-    hook({
-        email: inputs[0],
-        password: inputs[1]
-    }, '/auth').then(data => {
-        localStorage.setItem('email', data.email);
-        window.location.href = `/user/id${data.id}`;
-    });
+    if(inputs.every(el => el.length)) {
+        hook({
+            email: inputs[0],
+            password: inputs[1]
+        }, '/auth').then(data => {
+            if(data.email) {
+                localStorage.setItem('email', data.email);
+                return window.location.href = `/user/id${data.id}`;
+            }
+            alert(`${data.error}`);
+            window.location.href = `/auth`;
+        });
+    }
 }

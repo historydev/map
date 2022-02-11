@@ -11,22 +11,22 @@
 </head>
 <body>
     <div class="container">
-        <div id="register" class="form">
+        <form action="/register" id="register" method="POST" class="form">
             <div class="title">Регистрация</div>
             <input type="text" placeholder="first name" name="name" required>
             <input type="date" placeholder="Date of birth" name="date" required>
             <input type="email" placeholder="E-mail" name="email" required>
             <input type="tel" placeholder="Phone number" name="phone" required>
-            <button id="submitReg">Начать</button>
+            <button type="submit" id="submitReg">Начать</button>
             <a href="#" class="changeForm">Войти</a>
-        </div>
-        <div id="auth" class="form">
+        </form>
+        <form action="/auth" id="auth" method="POST" class="form">
             <div class="title">Авторизация</div>
             <input type="email" placeholder="E-mail" name="email" required>
             <input type="password" placeholder="Password" name="password" required>
             <button type="submit" id="submitAuth">Войти</button>
             <a href="#" class="changeForm">Регистрация</a>
-        </div>
+        </form>
     </div>
     <script src="./js/auth.js"></script>
 </body>

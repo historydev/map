@@ -55,10 +55,14 @@ app.post('/auth', (req, res) => {
             user.isAuth = true;
         }
         else {
-            return console.log('Incorrect pass');
+            return res.send({
+                error: 'Неверный пароль'
+            });
         }
     } else {
-        return console.log('Incorrect email');
+        return res.send({
+            error: 'Неверный email'
+        });
     }
     res.send({
         email: email,
@@ -71,7 +75,7 @@ app.post('/setEvent', (req, res) => {
     const {email, event} = req.body;
     if(email && event) {
         users.forEach(user => user.email === email ? user.events.push(event):user);
-        const events = users.find(user => user.email === email).events;
+        const events = users.find(user => user.email === email).events.filter(el => el.name === event.name);
         res.send({
             events: events
         });
@@ -83,6 +87,19 @@ app.post('/getEvents', (req, res) => {
     const user = users.find(user => user.email === email);
     if(user) {
         const events = user.events;
+        console.log(events);
+        res.send({
+            events: events
+        });
+    }
+});
+
+app.post('/getCountryEvents', (req, res) => {
+    const {email, name} = req.body;
+    const user = users.find(user => user.email === email);
+    if(user) {
+        const events = user.events.filter(el => el.name === name);
+        console.log(events);
         res.send({
             events: events
         });
@@ -94,7 +111,7 @@ app.post('/updateEvent', (req, res) => {
     const user = users.find(user => user.email === email);
     if(email && event && date) {
         const events = user.events
-        const index = user.events.findIndex(el => el.date === event.date);
+        const index = user.events.findIndex(el => el.name === event.name && el.date === event.date);
         if(index >= 0) user.events[index].date = date;
         console.log(events);
         res.send({
@@ -107,9 +124,9 @@ app.post('/removeEvent', (req, res) => {
     const {event, email} = req.body;
     const user = users.find(user => user.email === email);
     if(email && event) {
-        const events = user.events
-        const index = user.events.findIndex(el => el.date === event.date);
+        const index = user.events.findIndex(el => el.name === event.name && el.date === event.date);
         if(index >= 0) user.events.splice(index, 1);
+        const events = user.events.filter(el => el.name === event.name);
         res.send({
             events: events
         });
