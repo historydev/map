@@ -1,18 +1,9 @@
 {
   "name": "map",
   "version": "1.0.0",
-  "description": "",
   "main": "app.js",
-  "dependencies": {
-    "body-parser": "^1.19.1",
-    "air-datepicker": "^3.1.1",
-    "cors": "^2.8.5",
-    "express": "^4.17.2",
-    "path": "^0.12.7"
-  },
-  "devDependencies": {},
   "scripts": {
-    "start": "node app.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -23,5 +14,9 @@
   "bugs": {
     "url": "https://github.com/historydev/map/issues"
   },
-  "homepage": "https://github.com/historydev/map#readme"
+  "homepage": "https://github.com/historydev/map#readme",
+  "description": "",
+  "dependencies": {
+    "express": "^4.17.0"
+  }
 }
