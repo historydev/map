@@ -140,4 +140,4 @@ app.post('/clearEvents', (req, res) => {
     res.send({})
 });
 
-app.listen(process.env.PORT);
+app.listen(process.env.PORT || 3000);
