@@ -25,10 +25,11 @@ const hook = async(data, url) => {
     return res.json();
 }
 
-document.querySelector('.info').textContent = localStorage.getItem('password') ? `Ваш пароль: ${localStorage.getItem('password')}` : '';
+//document.querySelector('.info').textContent = localStorage.getItem('password') ? `Ваш пароль: ${localStorage.getItem('password')}` : '';
 
 document.querySelector('#submitReg').onclick = () => {
-    const inputs = [...reg.querySelectorAll('input')].map(el => el.value);
+    const input = [...reg.querySelectorAll('input')];
+    const inputs = input.map(el => el.value);
     if(inputs.every(el => el.length)) {
         return hook({
             name: inputs[0],
@@ -36,12 +37,13 @@ document.querySelector('#submitReg').onclick = () => {
             email: inputs[2],
             phone: inputs[3]
         }, '/register').then(res => {
-            localStorage.setItem('password', res.password);
-            window.location.href = `/auth`;
+            if(res.error) return document.querySelector('.info').textContent = `Ошибка: ${res.error}`;
+            input.forEach(el => el.value = '');
+            document.querySelector('.info').textContent = `Ваш пароль: ${res.password}`;
         });
     }
-    alert('Не все поля заполнены!');
-    window.location.href = `/auth`;
+    console.log(1);
+    document.querySelector('.info').textContent = 'Не все поля заполнены!';
 }
 
 document.querySelector('#submitAuth').onclick = () => {
@@ -55,8 +57,7 @@ document.querySelector('#submitAuth').onclick = () => {
                 localStorage.setItem('email', data.email);
                 return window.location.href = `/user/id${data.id}`;
             }
-            alert(`${data.error}`);
-            window.location.href = `/auth`;
+            document.querySelector('.info').textContent = data.error;
         });
     }
 }

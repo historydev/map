@@ -36,15 +36,21 @@ app.get('/auth', (req, res) => {
 app.post('/register', (req, res) => {
     const pass = Math.floor(Math.random() * 2000);
     const userID = users.length+1;
-    users.push({
-        id: userID,
-        ...req.body,
-        events: [],
-        password: pass.toString()
-    });
-    res.send({
-        password: pass.toString()
-    });
+    if(!users.find(el => el.email === req.body.email)) {
+        users.push({
+            id: userID,
+            ...req.body,
+            events: [],
+            password: pass.toString()
+        });
+        res.send({
+            password: pass.toString()
+        });
+    } else {
+        res.send({
+            error: 'Данный email занят'
+        });
+    }
 });
 
 app.post('/auth', (req, res) => {
