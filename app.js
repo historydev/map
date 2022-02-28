@@ -67,7 +67,7 @@ app.post('/auth', (req, res) => {
         }
     } else {
         return res.send({
-            error: 'Неверный email'
+            error: 'Такой пользователь не найден'
         });
     }
     res.send({
