@@ -39,7 +39,7 @@ document.querySelector('#submitReg').onclick = () => {
         }, '/register').then(res => {
             if(res.error) return document.querySelector('.info').textContent = `Ошибка: ${res.error}`;
             input.forEach(el => el.value = '');
-            document.querySelector('.info').textContent = `Ваш пароль: ${res.password}`;
+            reg.querySelector('.info').textContent = `Ваш пароль: ${res.password}`;
         });
     }
     console.log(1);
@@ -57,7 +57,7 @@ document.querySelector('#submitAuth').onclick = () => {
                 localStorage.setItem('email', data.email);
                 return window.location.href = `/user/id${data.id}`;
             }
-            document.querySelector('.info').textContent = data.error;
+            auth.querySelector('.info').textContent = data.error;
         });
     }
 }
