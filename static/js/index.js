@@ -29,7 +29,8 @@ const config = {
     countryStyle: {
         fill: 'rgb(255, 192, 96)',
         stroke: 'rgb(2, 93, 184)',
-        fillActive: 'red'
+        fillActive: 'red',
+        initial: 'rgb(212, 78, 78)'
     }
 }
 
@@ -56,7 +57,10 @@ fetch('/getCountryEvents', {
         name: 'AF'
     })
 }).then(data => data.json())
-    .then(data => myApp.loadSavedData(data.events))
+    .then(data => {
+        myApp.loadSavedData(data.events);
+        myApp.centerMap('AF');
+    })
     .catch(console.log);
 
 fetch('/getEvents', {
@@ -88,6 +92,8 @@ myApp.setEventOnCountry(modal, (fill, country, name) => {
     }
 }, countryEl);
 
+const eventEl = document.querySelector('.event');
+
 countryEl.onclick = (e) => {
     const name = countryEl.options[countryEl.selectedIndex].textContent;
     const value = countryEl.options[countryEl.selectedIndex].value;
@@ -105,7 +111,12 @@ countryEl.onclick = (e) => {
         .then(data => myApp.loadSavedData(data.events))
         .catch(console.log);
 
+    eventEl.querySelector('.title').textContent = name;
+
     myApp.centerMap(e.target.value);
+    myApp.changeCountry({
+        country: value
+    });
 }
 
 // Get event inputs

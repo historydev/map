@@ -52,6 +52,8 @@ export class App {
 
         this.chart.appear(1000, 100);
 
+        this.lastCountryElement = '';
+
     }
 
     centerMap(item) {
@@ -99,6 +101,9 @@ export class App {
             document.querySelector('.event').querySelector('.title').innerText = data.name;
 
             this.centerMap(data.id);
+            this.changeCountry({
+                country: data.id
+            });
             f(this.config.countryStyle.fillActive, data.id, data.name);
 
         });
@@ -108,8 +113,6 @@ export class App {
         const event = document.querySelector('.event');
         setTimeout(() => {
             if(data.length) {
-
-                console.log(data);
 
                 event.querySelector('.title').innerText = data[0].fullName;
                 event.querySelector('.dateslist').innerHTML =
@@ -188,7 +191,7 @@ export class App {
     setEvent(config) {
         const name = this.polygonSeries.getDataItemById(config.country).dataContext.name;
 
-        fetch('/setEvent', {
+        return fetch('/setEvent', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -204,35 +207,51 @@ export class App {
                 }
             })
         }).then(data => data.json())
-            .then(data => this.loadSavedData(data.events))
+            .then(data => {
+                this.loadSavedData(data.events);
+                console.log(data);
+                if(data.events.length) {
+                    this.polygonSeries.getDataItemById(config.country)._settings.mapPolygon.setAll({
+                        fill: config.fill || this.config.countryStyle.fillActive,
+                        tooltipText: `${name}`
+                    });
+                } else {
+                    console.log(this.polygonSeries.mapPolygons);
+                    this.changeCountry(config);
+                }
+                this.centerMap(config.country);
+            })
             .catch(console.log);
+    }
 
-        this.centerMap(config.country);
-
-        return this.polygonSeries.getDataItemById(config.country)._settings.mapPolygon.setAll({
-            fill: config.fill || this.config.countryStyle.fillActive,
-            date: config.date,
+    changeCountry(config) {
+        console.log(config);
+        this.polygonSeries.mapPolygons._values.map(el => el.setAll({
+            fill: this.config.countryStyle.fill,
+            tooltipText: `${name}`
+        }));
+        this.polygonSeries.getDataItemById(config.country)._settings.mapPolygon.setAll({
+            fill: this.config.countryStyle.initial,
             tooltipText: `${name}`
         });
-
     }
 
-    clearEvents() {
-        fetch('/clearEvents', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                email: localStorage.getItem('email')
-            })
-        }).then(data => console.log(data.json()))
-        this.polygonSeries.mapPolygons._values.map(el => el.setAll({
-            clicked: false,
-            fill: this.config.countryStyle.fill,
-            tooltipText: '{name}'
-        }));
-    }
+    // clearEvents() {
+    //     fetch('/clearEvents', {
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'application/json'
+    //         },
+    //         body: JSON.stringify({
+    //             email: localStorage.getItem('email')
+    //         })
+    //     }).then(data => console.log(data.json()))
+    //     this.polygonSeries.mapPolygons._values.map(el => el.setAll({
+    //         clicked: false,
+    //         fill: this.config.countryStyle.fill,
+    //         tooltipText: '{name}'
+    //     }));
+    // }
 
     getCountryList() {
         return new Promise((resolve, reject) => {

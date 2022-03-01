@@ -24,7 +24,7 @@ app.get('/', (req, res) => {
 
 app.get('/user/:id', (req, res) => {
     const {id} = req.params;
-    const userID = users.find(el => `id${el.id}` === id && el.isAuth);
+    const userID = users.find(el => `id${el.id}` === id);
     if(userID) return res.sendFile('./index.html', {root: __dirname + '/static'});
     res.redirect('/auth');
 });
@@ -79,69 +79,85 @@ app.post('/auth', (req, res) => {
 
 app.post('/setEvent', (req, res) => {
     const {email, event} = req.body;
-    if(email && event) {
-        users.forEach(user => user.email === email ? user.events.push(event):user);
+    const user = users.find(user => user.email === email && user.isAuth);
+    if(user && email && event) {
+        user.events.push(event);
         const events = users.find(user => user.email === email).events.filter(el => el.name === event.name);
-        res.send({
+        return res.send({
             events: events
         });
     }
+    res.send({
+        events: []
+    });
 });
 
 app.post('/getEvents', (req, res) => {
     const {email} = req.body;
-    const user = users.find(user => user.email === email);
+    const user = users.find(user => user.email === email && user.isAuth);
     if(user) {
         const events = user.events;
         console.log(events);
-        res.send({
+        return res.send({
             events: events
         });
     }
+    res.send({
+        events: []
+    });
 });
 
 app.post('/getCountryEvents', (req, res) => {
     const {email, name} = req.body;
-    const user = users.find(user => user.email === email);
+    const user = users.find(user => user.email === email && user.isAuth);
     if(user) {
         const events = user.events.filter(el => el.name === name);
         console.log(events);
-        res.send({
+        return res.send({
             events: events
         });
     }
+    res.send({
+        events: []
+    });
 });
 
 app.post('/updateEvent', (req, res) => {
     const {event, email, date} = req.body;
-    const user = users.find(user => user.email === email);
-    if(email && event && date) {
+    const user = users.find(user => user.email === email && user.isAuth);
+    if(user && email && event && date) {
         const index = user.events.findIndex(el => el.name === event.name && el.date === event.date);
         if(index >= 0) user.events[index].date = date;
         const events = user.events.filter(el => el.name === event.name);
-        res.send({
+        return res.send({
             events: events
         });
     }
+    res.send({
+        events: []
+    });
 });
 
 app.post('/removeEvent', (req, res) => {
     const {event, email} = req.body;
-    const user = users.find(user => user.email === email);
-    if(email && event) {
+    const user = users.find(user => user.email === email && user.isAuth);
+    if(user && email && event) {
         const index = user.events.findIndex(el => el.name === event.name && el.date === event.date);
         if(index >= 0) user.events.splice(index, 1);
         const events = user.events.filter(el => el.name === event.name);
-        res.send({
+        return res.send({
             events: events
         });
     }
+    res.send({
+        events: []
+    });
 });
 
 app.post('/clearEvents', (req, res) => {
     const {email} = req.body;
     if(email) {
-        users.find(user => user.email === email).events = [];
+        users.find(user => user.email === email && user.isAuth).events = [];
     } else return
     res.send({})
 });
