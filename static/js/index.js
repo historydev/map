@@ -94,7 +94,7 @@ myApp.setEventOnCountry(modal, (fill, country, name) => {
 
 const eventEl = document.querySelector('.event');
 
-// #Country
+// #Count
 
 countryEl.onchange = (e) => {
     const name = countryEl.options[countryEl.selectedIndex].textContent;
