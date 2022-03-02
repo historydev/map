@@ -143,7 +143,7 @@ document.querySelector('#auth').style.display = localStorage.getItem('email') ? 
 // Set clear events button
 //document.querySelector('#clear').onclick = () => myApp.clearEvents();
 
-// Set clear events button
+// Set clear events button.
 document.querySelector('#quit').onclick = () => {
     localStorage.clear();
     window.location.href = '/auth';
