@@ -93,8 +93,9 @@ app.post('/setEvent', (req, res) => {
 });
 
 app.post('/getEvents', (req, res) => {
-    const {email} = req.body;
-    const user = users.find(user => user.email === email && user.isAuth);
+    const {id} = req.body;
+    const user = users.find(user => user.id === id);
+    console.log(id);
     if(user) {
         const events = user.events;
         console.log(events);
@@ -108,8 +109,8 @@ app.post('/getEvents', (req, res) => {
 });
 
 app.post('/getCountryEvents', (req, res) => {
-    const {email, name} = req.body;
-    const user = users.find(user => user.email === email && user.isAuth);
+    const {id, name} = req.body;
+    const user = users.find(user => user.id === id);
     if(user) {
         const events = user.events.filter(el => el.name === name);
         console.log(events);

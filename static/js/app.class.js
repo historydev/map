@@ -80,7 +80,7 @@ export class App {
             const data = dataItem.dataContext;
             //const zoomAnimation = this.polygonSeries.zoomToDataItem(dataItem);
 
-            this.chart.zoomToGeoPoint({ longitude: 10, latitude: 52 }, 1, false);
+            //this.chart.zoomToGeoPoint({ longitude: 10, latitude: 52 }, 1, false);
 
             fetch('/getCountryEvents', {
                 method: 'POST',
@@ -88,7 +88,7 @@ export class App {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    email: localStorage.getItem('email'),
+                    id: window.location.pathname.replace('/user/id', ''),
                     name: data.id
                 })
             }).then(data => data.json())
@@ -104,7 +104,7 @@ export class App {
             this.changeCountry({
                 country: data.id
             });
-            f(this.config.countryStyle.fillActive, data.id, data.name);
+            f(data.fill || this.config.countryStyle.fillActive, data.id, data.name);
 
         });
     }
@@ -179,9 +179,10 @@ export class App {
                 event: event
             })
         }).then(data => data.json()).then(data => {
+            console.log(event);
             if(!data.length) {
                 this.polygonSeries.getDataItemById(event.name)._settings.mapPolygon.setAll({
-                    fill: this.config.countryStyle.fill,
+                    fill: event.fill || this.config.countryStyle.fill,
                 })
             }
             this.loadSavedData(data.events)
@@ -215,6 +216,7 @@ export class App {
                         fill: config.fill || this.config.countryStyle.fillActive,
                         tooltipText: `${name}`
                     });
+                    this.changeCountry(config);
                 } else {
                     console.log(this.polygonSeries.mapPolygons);
                     this.changeCountry(config);
@@ -226,12 +228,30 @@ export class App {
 
     changeCountry(config) {
         console.log(config);
+
         this.polygonSeries.mapPolygons._values.map(el => el.setAll({
             fill: this.config.countryStyle.fill,
             tooltipText: `${name}`
         }));
+
+        fetch('/getEvents', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                id: window.location.pathname.replace('/user/id', ''),
+                name: 'AF'
+            })
+        }).then(data => data.json())
+            .then(data => data.events.forEach(el => {
+                this.polygonSeries.getDataItemById(el.name)._settings.mapPolygon.setAll({
+                    fill: this.config.countryStyle.fillActive,
+                });
+            }));
+
         this.polygonSeries.getDataItemById(config.country)._settings.mapPolygon.setAll({
-            fill: this.config.countryStyle.initial,
+            fill: config.fill || this.config.countryStyle.initial,
             tooltipText: `${name}`
         });
     }

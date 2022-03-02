@@ -53,7 +53,7 @@ fetch('/getCountryEvents', {
         'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-        email: localStorage.getItem('email'),
+        id: window.location.pathname.replace('/user/id', ''),
         name: 'AF'
     })
 }).then(data => data.json())
@@ -69,15 +69,18 @@ fetch('/getEvents', {
         'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-        email: localStorage.getItem('email'),
+        id: window.location.pathname.replace('/user/id', ''),
         name: 'AF'
     })
 }).then(data => data.json())
-    .then(data => data.events.forEach(el => {
-        myApp.polygonSeries.getDataItemById(el.name)._settings.mapPolygon.setAll({
-            fill: myApp.config.countryStyle.fillActive,
-        });
-    }));
+    .then(data => {
+        console.log(data);
+        data.events.forEach(el => {
+            myApp.polygonSeries.getDataItemById(el.name)._settings.mapPolygon.setAll({
+                fill: myApp.config.countryStyle.fillActive,
+            });
+        })
+    });
 
 // Set click handler for country on map
 myApp.setEventOnCountry(modal, (fill, country, name) => {
@@ -106,7 +109,7 @@ countryEl.onchange = (e) => {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            email: localStorage.getItem('email'),
+            id: window.location.pathname.replace('/user/id', ''),
             name: value
         })
     }).then(data => data.json())
@@ -127,10 +130,15 @@ document.querySelector('#send').onclick = () => {
         myApp.setEvent({
             country: countryEl.value,
             date: document.querySelector('#date').value,
-            fullName: countryEl.options[countryEl.selectedIndex].textContent
+            fullName: countryEl.options[countryEl.selectedIndex].textContent,
+            fill: 'red'
         });
     }
 };
+
+document.querySelector('#send').style.display = localStorage.getItem('email') ? 'block' : 'none';
+document.querySelector('#quit').style.display = localStorage.getItem('email') ? 'block' : 'none';
+document.querySelector('#auth').style.display = localStorage.getItem('email') ? 'none' : 'block';
 
 // Set clear events button
 //document.querySelector('#clear').onclick = () => myApp.clearEvents();
@@ -138,5 +146,9 @@ document.querySelector('#send').onclick = () => {
 // Set clear events button
 document.querySelector('#quit').onclick = () => {
     localStorage.clear();
-    window.location.href = '/auth'; //1598 1740
+    window.location.href = '/auth';
+}
+
+document.querySelector('#auth').onclick = () => {
+    window.location.href = '/auth';
 }
