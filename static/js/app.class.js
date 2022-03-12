@@ -136,8 +136,7 @@ export class App {
 
                 this.polygonSeries.getDataItemById(data[0].name)._settings.mapPolygon.setAll({
                     fill: data[0].fill,
-                    date: data[0].date,
-                    tooltipText: data[0].tooltipText
+                    date: data[0].date
                 });
 
             } else {
@@ -204,7 +203,6 @@ export class App {
                     fullName: config.fullName,
                     fill: config.fill || this.config.countryStyle.fillActive,
                     date: config.date,
-                    tooltipText: `${name}`
                 }
             })
         }).then(data => data.json())
@@ -213,12 +211,10 @@ export class App {
                 console.log(data);
                 if(data.events.length) {
                     this.polygonSeries.getDataItemById(config.country)._settings.mapPolygon.setAll({
-                        fill: config.fill || this.config.countryStyle.fillActive,
-                        tooltipText: `${name}`
+                        fill: config.fill || this.config.countryStyle.fillActive
                     });
                     this.changeCountry(config);
                 } else {
-                    console.log(this.polygonSeries.mapPolygons);
                     this.changeCountry(config);
                 }
                 this.centerMap(config.country);
@@ -229,9 +225,8 @@ export class App {
     changeCountry(config) {
         console.log(config);
 
-        this.polygonSeries.mapPolygons._values.map(el => el.setAll({
+        this.polygonSeries.mapPolygons._values.map(el => el._dataItem._settings.mapPolygon._settings.fill === 'red' ? false : el.setAll({
             fill: this.config.countryStyle.fill,
-            tooltipText: `${name}`
         }));
 
         fetch('/getEvents', {
@@ -252,7 +247,6 @@ export class App {
 
         this.polygonSeries.getDataItemById(config.country)._settings.mapPolygon.setAll({
             fill: config.fill || this.config.countryStyle.initial,
-            tooltipText: `${name}`
         });
     }
 

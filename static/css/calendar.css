@@ -1,0 +1,132 @@
+* {
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    padding-top: 100px;
+}
+
+.calendar {
+    width: 840px;
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    padding-top: 20px;
+}
+
+.calendar .item {
+    width: 200px;
+    color: #444;
+    border: 1px solid rgb(0, 160, 224);
+    border-radius: 5px;
+    margin: 10px 0 0 10px;
+    padding-bottom: 20px;
+}
+
+.calendar .item .name {
+    width: 100%;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 1px solid #ccc;
+}
+
+.calendar .item .days {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    margin: 3px 0 0 9px;
+    background-size: 80% 80%;
+}
+
+.calendar .item .days .day {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 13px;
+    margin: 3px 3px 0 0;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+}
+
+.years {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid rgb(0, 160, 224);
+}
+
+.years .year {
+    width: 150px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    color: rgb(0, 160, 224);
+    border-left: 1px solid rgb(0, 160, 224);
+    cursor: pointer;
+    position: relative;
+}
+
+.years .year:nth-child(2) {
+    border-left: 0;
+}
+
+.years .year:hover {
+    background: rgb(0, 160, 224);
+    color: #fff;
+    border: 0;
+}
+
+.years .year .counter {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgb(0, 160, 224);
+    color: #fff;
+    border-radius: 50%;
+    font-size: 11px;
+    position: absolute;
+    right: 2px;
+    bottom: 2px;
+    z-index: 999;
+}
+
+.years .year:hover .counter {
+    background: #fff;
+    color: rgb(0, 160, 224);
+    border: 0;
+}
+
+.years .control {
+    width: 35px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #fff;
+    color: rgb(0, 160, 224);
+    cursor: pointer;
+}
+
+.years .control:hover {
+    background: rgb(0, 160, 224);
+    color: #fff;
+}

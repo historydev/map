@@ -6,7 +6,7 @@ const path = require('path');
 
 app.use(bp.json());
 //app.use(cors());
-app.use(express.static('static'))
+app.use(express.static('static'));
 
 const users = [
     {
@@ -20,6 +20,10 @@ const users = [
 
 app.get('/', (req, res) => {
    res.sendFile('./auth.html');
+});
+
+app.get('/user/:id/calendar', (req, res) => {
+    res.sendFile('./calendar.html', {root: __dirname + '/static'})
 });
 
 app.get('/user/:id', (req, res) => {
