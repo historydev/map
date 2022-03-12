@@ -85,3 +85,24 @@ calendar.innerHTML = calendarData.map(month => `
         </div>
     </div>
 `).join('');
+
+// Generate Years
+
+function yearGenerator(start, next, counter) {
+    const arr = [];
+    if(next) {
+        for(let i = start; i < start+counter; i++) {
+            arr.push(i);
+        }
+    } else {
+        for(let i = start; i > start-counter; i--) {
+            arr.push(i);
+        }
+    }
+
+    const filteredArr = arr.filter(year => year === start ? false : year);
+
+    return next ? filteredArr : filteredArr.reverse()
+}
+
+console.log(yearGenerator(2021, true, 9));
