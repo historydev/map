@@ -74,6 +74,12 @@ body, html {
     margin-left: 10px;
 }
 
+.years .content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .years .year {
     width: 110px;
     height: 35px;
@@ -87,10 +93,6 @@ body, html {
     position: relative;
     border-top: 1px solid rgb(0, 160, 224);
     border-bottom: 1px solid rgb(0, 160, 224);
-}
-
-.years .year:nth-child(2) {
-    border-left: 0;
 }
 
 .years .year:hover {
@@ -136,4 +138,8 @@ body, html {
 .years .control:hover {
     background: rgb(0, 160, 224);
     color: #fff;
+}
+
+.years .left {
+    border-right: 0;
 }

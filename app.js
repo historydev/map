@@ -99,7 +99,6 @@ app.post('/setEvent', (req, res) => {
 app.post('/getEvents', (req, res) => {
     const {id} = req.body;
     const user = users.find(user => user.id === id);
-    console.log(id);
     if(user) {
         const events = user.events;
         console.log(events);

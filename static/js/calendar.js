@@ -70,6 +70,8 @@ const calendarData = [
     }
 ];
 
+const userID = window.location.pathname.replace('/user/id', '').replace('/calendar', '');
+
 // Generate calendar items
 
 const calendar = document.querySelector('.calendar');
@@ -88,14 +90,14 @@ calendar.innerHTML = calendarData.map(month => `
 
 // Generate Years
 
-function yearGenerator(start, next, counter) {
+function yearGenerator(start, next, count) {
     const arr = [];
     if(next) {
-        for(let i = start; i < start+counter; i++) {
+        for(let i = start; i < start+count+1; i++) {
             arr.push(i);
         }
     } else {
-        for(let i = start; i > start-counter; i--) {
+        for(let i = start; i > start-count-1; i--) {
             arr.push(i);
         }
     }
@@ -105,4 +107,57 @@ function yearGenerator(start, next, counter) {
     return next ? filteredArr : filteredArr.reverse()
 }
 
-console.log(yearGenerator(2021, true, 9));
+// Show years
+
+const yearsBox = document.querySelector('.years .content');
+const controlLeft = document.querySelector('.years .left');
+const controlRight = document.querySelector('.years .right');
+let last_year = new Date().getFullYear()-1;
+
+const yearsData = async (id) => {
+    const eventsYears = [];
+    await fetch('/getEvents', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            id: id,
+        })
+    }).then(events => events.json()).then(events => {
+        events.events.forEach(event => {
+            eventsYears.push(event.date.split(',')[0].split('.')[2]);
+        });
+    });
+    return eventsYears
+}
+
+function setYears(arr, next) {
+
+    if(next) arr.reverse();
+    last_year = arr[0];
+
+    yearsBox.innerHTML = arr.map(year =>
+        `<div class="year">
+            <div class="title">${year}</div>
+            <div class="counter">0</div>
+        </div>`
+    ).join('');
+
+    yearsData(userID).then(years => {
+        years.forEach(year => {
+            yearsBox.querySelectorAll('.year').forEach(el => {
+                el.querySelector('.counter').textContent = el.querySelector('.title').textContent === year ?
+                    +el.querySelector('.counter').textContent+1:0;
+            });
+        });
+    });
+
+    return arr
+
+}
+
+setYears(yearGenerator(last_year, true, 7));
+
+controlLeft.onclick = () => setYears(yearGenerator(last_year, false, 7), false);
+controlRight.onclick = () => setYears(yearGenerator(last_year, true, 7), true);

@@ -236,7 +236,6 @@ export class App {
             },
             body: JSON.stringify({
                 id: window.location.pathname.replace('/user/id', ''),
-                name: 'AF'
             })
         }).then(data => data.json())
             .then(data => data.events.forEach(el => {
