@@ -90,21 +90,34 @@ calendar.innerHTML = calendarData.map(month => `
 
 // Generate Years
 
-function yearGenerator(start, next, count) {
-    const arr = [];
-    if(next) {
-        for(let i = start; i < start+count+1; i++) {
-            arr.push(i);
+function YearGenerator(count) {
+    this.arr = [];
+    this.last_year = new Date().getFullYear()-count;
+
+    this.next = () => {
+        this.arr = [];
+        for(let i = this.last_year; i < this.last_year+count+1; i++) {
+            this.arr.push(i);
         }
-    } else {
-        for(let i = start; i > start-count-1; i--) {
-            arr.push(i);
+        this.last_year = this.arr[this.arr.length-1];
+        this.arr = [];
+        for(let i = this.last_year; i < this.last_year+count+1; i++) {
+            this.arr.push(i);
         }
+
+        return this.arr;
     }
 
-    const filteredArr = arr.filter(year => year === start ? false : year);
+    this.prev = () => {
+        this.arr = [];
+        for(let i = this.last_year; i > this.last_year-count-1; i--) {
+            this.arr.unshift(i);
+        }
+        this.last_year = this.arr[0];
 
-    return next ? filteredArr : filteredArr.reverse()
+        return this.arr;
+    }
+
 }
 
 // Show years
@@ -112,7 +125,6 @@ function yearGenerator(start, next, count) {
 const yearsBox = document.querySelector('.years .content');
 const controlLeft = document.querySelector('.years .left');
 const controlRight = document.querySelector('.years .right');
-let last_year = new Date().getFullYear()-1;
 
 const yearsData = async (id) => {
     const eventsYears = [];
@@ -132,12 +144,9 @@ const yearsData = async (id) => {
     return eventsYears
 }
 
-function setYears(arr, next) {
+function setYears(arr) {
 
-    if(next) arr.reverse();
-    last_year = arr[0];
-
-    yearsBox.innerHTML = arr.map(year =>
+    yearsBox.innerHTML = arr.sort().map(year =>
         `<div class="year">
             <div class="title">${year}</div>
             <div class="counter">0</div>
@@ -157,7 +166,9 @@ function setYears(arr, next) {
 
 }
 
-setYears(yearGenerator(last_year, true, 7));
+const yearGenerator = new YearGenerator(6);
 
-controlLeft.onclick = () => setYears(yearGenerator(last_year, false, 7), false);
-controlRight.onclick = () => setYears(yearGenerator(last_year, true, 7), true);
+setYears(yearGenerator.next());
+
+controlLeft.onclick = () => setYears(yearGenerator.prev());
+controlRight.onclick = () => setYears(yearGenerator.next());
