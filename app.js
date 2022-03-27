@@ -1,8 +1,25 @@
-const express = require('express');
+import express from 'express';
+import bp from 'body-parser';
+import {MongoClient} from 'mongodb';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+import userSchema from './schemas/user.schema.js';
+
+const __dirname = dirname(fileURLToPath(import.meta.url)) + '/static';
+
 const app = express();
-//const cors = require('cors');
-const bp = require('body-parser');
-const path = require('path');
+app.use(express.static('static'));
+
+const url = 'mongodb+srv://historydev:aasus2001@map1.gufrr.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
+const client = new MongoClient(url);
+
+const dbName = 'map';
+
+async function query(collectionName) {
+    await client.connect();
+    const db = client.db(dbName);
+    return db.collection(collectionName);
+}
 
 app.use(bp.json());
 //app.use(cors());
@@ -23,22 +40,22 @@ app.get('/', (req, res) => {
 });
 
 app.get('/user/:id/calendar', (req, res) => {
-    res.sendFile('./calendar.html', {root: __dirname + '/static'})
+    res.sendFile('./calendar.html', {root: __dirname})
 });
 
 app.get('/user/:id', (req, res) => {
     const {id} = req.params;
     const userID = users.find(el => `id${el.id}` === id);
-    if(userID) return res.sendFile('./index.html', {root: __dirname + '/static'});
+    if(userID) return res.sendFile('./index.html', {root: __dirname});
     res.redirect('/auth');
 });
 
 app.get('/auth', (req, res) => {
-    res.sendFile('./auth.html', {root: __dirname + '/static'});
+    res.sendFile('./auth.html', {root: __dirname});
 });
 
 app.post('/register', (req, res) => {
-    const pass = Math.floor(Math.random() * 2000);
+    const pass = Math.floor(Math.random() * 2000).toString();
     const userID = users.length+1;
     if(!users.find(el => el.email === req.body.email)) {
         users.push({
@@ -55,6 +72,43 @@ app.post('/register', (req, res) => {
             error: 'Данный email занят'
         });
     }
+
+    // query('users')
+    //     .then(async collection => {
+    //
+    //         const user = {};
+    //
+    //         const currUser = {
+    //             id: 1,
+    //             name: 'John',
+    //             email: '123',
+    //             date: '22.02.2022',
+    //             phone: '123'
+    //         }
+    //
+    //         for(let key in userSchema) {
+    //             if(currUser[key] && typeof userSchema[key] === typeof currUser[key]) {
+    //                 user[key] = currUser[key];
+    //             }
+    //         }
+    //
+    //         if(Object.keys(user).length === Object.keys(userSchema).length) {
+    //             await collection.find({email: user.email}).toArray().then(data => {
+    //                 if(!data.length) {
+    //                     return collection.insertMany([user]).then(console.log)
+    //                 }
+    //                 throw 'Such user found';
+    //             }).then((data) => {
+    //                 client.close();
+    //                 return data
+    //             }).catch(console.error).finally(console.log);
+    //         } else {
+    //             console.error('Empty property in object user');
+    //         }
+    //
+    //     })
+    //     .catch(console.error);
+
 });
 
 app.post('/auth', (req, res) => {
