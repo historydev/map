@@ -88,7 +88,7 @@ export class App {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    id: window.location.pathname.replace('/user/id', ''),
+                    id: +window.location.pathname.replace('/user/id', ''),
                     name: data.id
                 })
             }).then(data => data.json())
@@ -174,8 +174,8 @@ export class App {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                email: localStorage.getItem('email'),
-                event: event
+                id: event.id,
+                name: event.name
             })
         }).then(data => data.json()).then(data => {
             console.log(event);
@@ -235,7 +235,7 @@ export class App {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                id: window.location.pathname.replace('/user/id', ''),
+                id: +window.location.pathname.replace('/user/id', ''),
             })
         }).then(data => data.json())
             .then(data => data.events.forEach(el => {
@@ -248,23 +248,6 @@ export class App {
             fill: config.fill || this.config.countryStyle.initial,
         });
     }
-
-    // clearEvents() {
-    //     fetch('/clearEvents', {
-    //         method: 'POST',
-    //         headers: {
-    //             'Content-Type': 'application/json'
-    //         },
-    //         body: JSON.stringify({
-    //             email: localStorage.getItem('email')
-    //         })
-    //     }).then(data => console.log(data.json()))
-    //     this.polygonSeries.mapPolygons._values.map(el => el.setAll({
-    //         clicked: false,
-    //         fill: this.config.countryStyle.fill,
-    //         tooltipText: '{name}'
-    //     }));
-    // }
 
     getCountryList() {
         return new Promise((resolve, reject) => {

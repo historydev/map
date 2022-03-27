@@ -53,7 +53,7 @@ fetch('/getCountryEvents', {
         'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-        id: window.location.pathname.replace('/user/id', ''),
+        id: +window.location.pathname.replace('/user/id', ''),
         name: 'AF'
     })
 }).then(data => data.json())
@@ -69,7 +69,7 @@ fetch('/getEvents', {
         'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-        id: window.location.pathname.replace('/user/id', ''),
+        id: +window.location.pathname.replace('/user/id', ''),
         name: 'AF'
     })
 }).then(data => data.json())
@@ -136,17 +136,35 @@ document.querySelector('#send').onclick = () => {
     }
 };
 
-document.querySelector('#send').style.display = localStorage.getItem('email') ? 'block' : 'none';
-document.querySelector('#quit').style.display = localStorage.getItem('email') ? 'block' : 'none';
-document.querySelector('#auth').style.display = localStorage.getItem('email') ? 'none' : 'block';
-
-// Set clear events button
-//document.querySelector('#clear').onclick = () => myApp.clearEvents();
-
-// Set clear events button.
+fetch('/isAuth', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        id: +window.location.pathname.replace('/user/id', '')
+    })
+}).then(data => data.json()).then(data => {
+    console.log(data);
+    document.querySelector('#send').style.display = data.auth ? 'block' : 'none';
+    document.querySelector('#quit').style.display = data.auth ? 'block' : 'none';
+    document.querySelector('#auth').style.display = data.auth ? 'none' : 'block';
+});
+// Set quit button
 document.querySelector('#quit').onclick = () => {
-    localStorage.clear();
-    window.location.href = '/auth';
+    fetch('/quit', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            id: +window.location.pathname.replace('/user/id', '')
+        })
+    }).finally(() => {
+        document.querySelector('#send').style.display = 'none';
+        document.querySelector('#quit').style.display = 'none';
+        document.querySelector('#auth').style.display = 'block';
+    });
 }
 
 document.querySelector('#auth').onclick = () => {

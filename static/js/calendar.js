@@ -70,7 +70,7 @@ const calendarData = [
     }
 ];
 
-const userID = window.location.pathname.replace('/user/id', '').replace('/calendar', '');
+const userID = +window.location.pathname.replace('/user/id', '').replace('/calendar', '');
 
 // Set calendar items
 
