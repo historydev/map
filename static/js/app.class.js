@@ -93,6 +93,7 @@ export class App {
                 })
             }).then(data => data.json())
                 .then(res => {
+                    console.log(res);
                     this.loadSavedData(res.events)
                 })
                 .catch(console.log);

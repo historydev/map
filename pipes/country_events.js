@@ -3,31 +3,28 @@ export default function countryEventsPipe(req, res, eventSchema, validator, db) 
     db.query('events')
         .then(async collection => {
 
-            const {client, find} = db;
-
             const {id, name} = req.body;
-
-            console.log(id, name);
 
             const events = validator({id, name}, eventSchema.countryEvents);
 
             if(events) {
-                find(collection, {userID: id, name}).then(data => {
+                await db.find(collection, {userID: events.id, name: events.name}).then(data => {
                     if(data.length) {
                         return data
                     }
                     throw 'Events not found';
                 }).then(events => {
-                    client.close();
                     res.send({events});
                     return events
-                }).catch(() => {
+                }).catch(err => {
+                    console.log(err);
                     res.send({events:[]});
-                }).finally(console.log);
+                }).finally(() => db.client.close());
             } else {
                 console.error('Empty property in object user');
             }
 
         })
+        .then(() => db.client.close())
         .catch(console.error);
 }

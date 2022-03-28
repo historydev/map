@@ -13,13 +13,10 @@ import updateEventPipe from "./pipes/update_event.js";
 import mapPagePipe from "./pipes/map_page.js";
 import deleteEventPipe from "./pipes/delete_event.js";
 import validator from "./validator.js";
-import mongo_db from './mongo_db/config.js';
-import db_help_functions from './mongo_db/help_functions.js';
+import Connection from './mongo_db/config.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url)) + '/static';
 const app = express();
-const {query, client} = mongo_db;
-const {find} = db_help_functions;
 const usersSessions = [];
 
 app.use(bp.json());
@@ -44,7 +41,7 @@ app.post('/register', (req, res) => registerPipe(
     res,
     userSchema,
     validator,
-    {query, client, find}
+    new Connection()
 ));
 
 app.post('/auth', (req, res) => authPipe(
@@ -53,7 +50,7 @@ app.post('/auth', (req, res) => authPipe(
     usersSessions,
     userSchema,
     validator,
-    {query, client, find}
+    new Connection()
 ));
 
 app.post('/quit', (req, res) => {
@@ -68,7 +65,7 @@ app.post('/setEvent', (req, res) => eventPipe(
     usersSessions,
     eventSchema,
     validator,
-    {query, client, find}
+    new Connection()
 ));
 
 app.post('/getEvents', (req, res) => eventsPipe(
@@ -76,7 +73,7 @@ app.post('/getEvents', (req, res) => eventsPipe(
     res,
     eventSchema,
     validator,
-    {query, client, find}
+    new Connection()
 ));
 
 app.post('/getCountryEvents', (req, res) => countryEventsPipe(
@@ -84,7 +81,7 @@ app.post('/getCountryEvents', (req, res) => countryEventsPipe(
     res,
     eventSchema,
     validator,
-    {query, client, find}
+    new Connection()
 ));
 
 app.post('/updateEvent', (req, res) => updateEventPipe(
@@ -93,13 +90,13 @@ app.post('/updateEvent', (req, res) => updateEventPipe(
     usersSessions,
     eventSchema,
     validator,
-    {query, client, find}
+    new Connection()
 ));
 
 app.post('/removeEvent', (req, res) => deleteEventPipe(
     req,
     res,
-    {query, client, find}
+    new Connection()
 ));
 
 app.listen(process.env.PORT || 3000);

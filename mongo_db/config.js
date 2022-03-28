@@ -1,14 +1,23 @@
 import {MongoClient} from "mongodb";
 
 const url = 'mongodb+srv://historydev:aasus2001@map1.gufrr.mongodb.net/myFirstDatabase?retryWrites=true&w=majority';
-const client = new MongoClient(url);
 const dbName = 'map';
 
-export default {
-    query: async function (collectionName) {
-        await client.connect();
-        const db = client.db(dbName);
-        return db.collection(collectionName);
-    },
-    client: client
+export default class Connection {
+    constructor() {
+        this.client = new MongoClient(url);
+        this.collection = undefined;
+    }
+
+    async query(collectionName) {
+        await this.client.connect();
+        const db = this.client.db(dbName);
+        this.collection = await db.collection(collectionName);
+        return this.collection
+    }
+
+    async find(collection, item) {
+        return await this.collection.find(item).toArray();
+    }
+
 }

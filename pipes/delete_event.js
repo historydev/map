@@ -1,7 +1,7 @@
 export default function deleteEventPipe(req, res, db) {
     const {id, name} = req.body;
-    db.query('events').then(collection => {
+    db.query('events').then(async collection => {
         collection.deleteMany({id: id});
-        db.find(collection, {name}).then(data => res.send({events: data}));
-    }).then(() => db.client.close());
+        await db.find(collection, {name}).then(data => res.send({events: data}));
+    }).finally(() => db.client.close());
 }

@@ -3,8 +3,6 @@ export default function authPipe(req, res, usersSessions, userSchema, validator,
     db.query('users')
     .then(async collection => {
 
-        const {client, find} = db;
-
         const {email, password} = req.body;
         const currUser = {
             email: email,
@@ -14,14 +12,13 @@ export default function authPipe(req, res, usersSessions, userSchema, validator,
         const user = validator(currUser, userSchema.auth);
 
         if(user) {
-            find(collection, user).then(data => {
+            await db.find(collection, user).then(data => {
                 if(data.length) {
                     usersSessions.push({id: data[0].id});
                     return data[0]
                 }
                 throw 'User not found';
             }).then((data) => {
-                client.close();
                 res.send({
                     email: email,
                     id: data.id,
@@ -32,7 +29,7 @@ export default function authPipe(req, res, usersSessions, userSchema, validator,
                 res.send({
                     error: 'Такой пользователь не найден'
                 });
-            }).finally(console.log);
+            }).finally(() => db.client.close());
         } else {
             console.error('Empty property in object user');
         }
