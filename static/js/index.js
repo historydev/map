@@ -8,6 +8,18 @@ $('.date').datepicker({
     range: true
 });
 
+function getAllDaysOfMonth(year, month){
+    const lastDayOfMonth = new Date(year, month , 0).getDate();
+    const arr = [];
+    for (let i = 1; i < lastDayOfMonth + 1; i++) {
+        const date = new Date(year, month-1, i);
+        arr.push(`${date.getDate() < 10 ? `0${date.getDate()}`: date.getDate()}.${date.getMonth()+1 < 10 ? `0${date.getMonth()+1}` : date.getMonth()+1}.${date.getFullYear()}`); //Here will print all days
+    }
+    return arr
+}
+
+console.log(getAllDaysOfMonth(2022, 10));
+
 // Handler for dates
 const modal = document.querySelector('.modal');
 
@@ -145,10 +157,15 @@ fetch('/isAuth', {
         id: +window.location.pathname.replace('/user/id', '')
     })
 }).then(data => data.json()).then(data => {
+    const email = typeof data[0] === typeof {};
     console.log(data);
-    document.querySelector('#send').style.display = data.auth ? 'block' : 'none';
-    document.querySelector('#quit').style.display = data.auth ? 'block' : 'none';
-    document.querySelector('#auth').style.display = data.auth ? 'none' : 'block';
+    const quit = document.querySelector('#quit');
+    const emailBox = quit.querySelector('#email');
+    document.querySelector('#send').style.display = email ? 'block' : 'none';
+    quit.style.display = email ? 'block' : 'none';
+    emailBox.style.display = email ? 'block' : 'none';
+    emailBox.textContent = email ? data[0].email : '';
+    document.querySelector('#auth').style.display = email ? 'none' : 'block';
 });
 // Set quit button
 document.querySelector('#quit').onclick = () => {

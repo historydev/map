@@ -3,25 +3,24 @@ export default function updateEventPipe(req, res, usersSessions, eventSchema, va
     db.query('users')
         .then(async collection => {
 
-            const {client, find} = db;
-
             const data = validator(req.body, eventSchema.updateEvent);
             const {email, date, event} = data;
 
             if(data) {
-                find(collection, {email}).then(data => {
+                await db.find(collection, {email}).then(data => {
                     if(data.length) {
 
                         if(usersSessions.find(user => user.id === data[0].id)) {
 
                             db.query('events').then(async collection => {
 
-                                collection.updateMany({id: event.id}, {$set: {date}}).then(() => {
-                                    find(collection, {}).then(events => {
-                                        console.log(events);
-                                        res.send({events});
-                                    }).then(() => client.close());
-                                }).catch(console.log);
+                                await db.find(collection, {id: event.id}).then(async data => {
+                                    await collection.updateMany({id: event.id}, {$set: {date}}).then(async () => {
+                                        await db.find(collection, {userID: data[0].userID, name: data[0].name}).then(events => {
+                                            res.send({events});
+                                        });
+                                    }).catch(console.log);
+                                }).then(() => db.client.close());
 
                             }).catch(console.log);
                             return;

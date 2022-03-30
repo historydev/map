@@ -17,7 +17,7 @@ import Connection from './mongo_db/config.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url)) + '/static';
 const app = express();
-const usersSessions = [];
+const usersSessions = [{id: 5}];
 
 app.use(bp.json());
 app.use(express.static('static'));
@@ -31,7 +31,8 @@ app.get('/user/:id', (req, res) => res.sendFile('./home.html', {root: __dirname}
 app.post('/isAuth', (req, res) => mapPagePipe(
     req,
     res,
-    usersSessions
+    usersSessions,
+    new Connection()
 ));
 
 app.get('/auth', (req, res) => res.sendFile('./auth.html', {root: __dirname}));

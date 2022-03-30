@@ -206,3 +206,21 @@ select {
 #update {
     display: none;
 }
+
+#quit {
+    position: relative;
+}
+
+#email {
+    width: 200px;
+    height: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #fff;
+    color: rgb(0, 160, 224);
+    font-size: 12px;
+    position: absolute;
+    left: calc(50% - 100px);
+    bottom: -25px;
+}

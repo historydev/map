@@ -6,6 +6,10 @@ export default function eventPipe(req, res, usersSessions, eventSchema, validato
             const email = req.body.email, currEvent = req.body.event;
             const event = validator(currEvent, eventSchema.setEvent);
 
+            const date = event.date;
+
+            console.log(date);
+
             if(event) {
                 await db.find(collection, {email}).then(async data => {
                     if(data.length) {
@@ -23,7 +27,7 @@ export default function eventPipe(req, res, usersSessions, eventSchema, validato
                                         collection.insertMany([{id: eventID, ...event}]);
                                     }
                                 });
-                                await db.find(collection, {name: event.name}).then(events => {
+                                await db.find(collection, {name: event.name, userID: event.userID}).then(events => {
                                     res.send({events});
                                 })
                                 .catch(console.log)

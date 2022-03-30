@@ -175,24 +175,81 @@ const setEvents = async(year) => {
     return await getEvents(userID).then(events => events.json()).then(data => {
         const filteredData = data.events.map(el => ({
             name: el.name,
-            date: el.date.split(',').map(el => el.split('.'))
+            dateStart: (() => {
+                const date = el.date.split(',').map(el => el.split('.'))[0];
+                return {
+                    day: parseInt(date[0]),
+                    month: date[1],
+                    year: date[2]
+                }
+            })(),
+            dateEnd: (() => {
+                const date = el.date.split(',').map(el => el.split('.'))[1];
+                return {
+                    day: parseInt(date[0]),
+                    month: date[1],
+                    year: date[2]
+                }
+            })()
         }));
         const arr = calendarData.map(el => JSON.parse(JSON.stringify(el)));
+        console.log(filteredData);
         filteredData.forEach(event => {
 
-            const minDay = +event.date[0][0].replace('0', '');
-            const maxDay = +event.date[1][0].replace('0', '');
-            const months = [event.date[0][1], event.date[1][1]];
-            const years = [event.date[0][2], event.date[1][2]];
+            const startDate = {
+                minDay: event.dateStart.day,
+                maxDay: event.dateEnd.month === event.dateStart.month ? event.dateEnd.day : arr.find(month => month.id === event.dateStart.month).days.length,
+                month: event.dateStart.month,
+                year: event.dateStart.year
+            }
+
+            const endDate = {
+                minDay: 1,
+                maxDay: event.dateEnd.day,
+                month: event.dateEnd.month,
+                year: event.dateEnd.year
+            }
+
             const name = event.name;
 
-            if(years.includes(year)) {
-                for(let i = minDay-1; i < maxDay; i++) {
-                    months.forEach(month => {
-                        arr.find(el => el.id === month).days[i] = `<div class="flag-${name}"></div>`;
-                    });
+            const mountDays = (dates) => {
+                const months = [];
+                const startDate = dates.startDate;
+                const endDate = dates.endDate;
+                for(let i = parseInt(startDate.month); i <= endDate.month; i++) {
+                    months.push(i > 9 ? ''+i : '0'+i);
                 }
+                console.log(months);
+                months.forEach(month => {
+                   setDays({
+                       minDay: 1,
+                       maxDay: arr.find(el => el.id === month).days.length,
+                       month: month,
+                       year: startDate.year
+                   });
+                });
+                setDays(startDate);
+                setDays(endDate);
+
+                console.log(months);
             }
+
+            const setDays = (date) => {
+                arr.find(el => el.id === date.month).days.forEach((day, i, arr) => {
+                    if(day >= date.minDay && day <= date.maxDay) {
+                        return arr[i] = `<div class="flag-${name}"></div>`
+                    }
+                    return false
+                });
+            }
+
+            if(startDate.year === year || endDate.year === year) {
+                mountDays({startDate, endDate});
+            }
+
+
+
+            console.log(arr);
 
         });
         return arr
