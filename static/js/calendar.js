@@ -227,47 +227,55 @@ const setEvents = async(year) => {
                 const years = [];
                 const startDate = dates.startDate;
                 const endDate = dates.endDate;
-                for(let i = parseInt(startDate.year); i <= endDate.year; i++) {
-                    years.push(i);
-                }
-                console.log(year, endDate.year, startDate.year);
+
                 if(endDate.year === year) {
                     for(let i = 1; i <= endDate.month; i++) {
                         months.push(i > 9 ? ''+i : '0'+i);
                     }
                     getMonths(months, endDate, arr);
+                }
+
+                for(let i = parseInt(startDate.year); i < endDate.year; i++) {
+                    years.push(i);
+                }
+                console.log(year, endDate.year, startDate.year);
+                console.log(years);
+                console.log(years.includes(parseInt(year)));
+
+                if(years.includes(parseInt(year))) {
+
+                    if(year < endDate.year && year >= startDate.year) {
+                        for(let i = 1; i <= 12; i++) {
+                            months.push(i > 9 ? ''+i : '0'+i);
+                        }
+                    }
+
+                    getMonths(months, startDate, arr);
+                } else if(year === endDate.year) {
+                    setDays(endDate);
                 } else {
-                    for(let i = 1; i <= 12; i++) {
-                        months.push(i > 9 ? ''+i : '0'+i);
-                    }
+                    arr.forEach(el => el.days = dayGenerator(getAllDaysOfMonth(year, el.id).length));
                     getMonths(months, startDate, arr);
                 }
 
-                if(years.includes(year) && year !== endDate.year && year !== startDate.year) {
 
-                    console.log(1);
-                    for(let i = 1; i <= 12; i++) {
-                        months.push(i > 9 ? ''+i : '0'+i);
-                    }
-                    getMonths(months, startDate, arr);
-                }
-
-                setDays(startDate);
-                setDays(endDate);
             }
 
             const getMonths = (months, date, arr) => {
-                months.forEach((month, i, array) => {
-                    setDays({
-                        minDay: 1,
-                        maxDay: i >= array.length-1 ? date.maxDay : arr.find(month => month.id === date.month).days.length,
-                        month: month,
-                        year: date.year
+                if(months.length >= 1) {
+                    months.forEach((month, i, array) => {
+                        setDays({
+                            minDay: 1,
+                            maxDay: i >= array.length-1 ? date.maxDay : arr.find(month => month.id === date.month).days.length+1,
+                            month: month,
+                            year: date.year
+                        });
                     });
-                });
+                }
             }
 
             const setDays = (date) => {
+                console.log(date);
                 arr.find(el => el.id === date.month).days.forEach((day, i, arr) => {
                     if(day >= date.minDay && day <= date.maxDay) {
                         return arr[i] = `<div class="flag-${name}"></div>`
