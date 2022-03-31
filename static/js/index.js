@@ -8,18 +8,6 @@ $('.date').datepicker({
     range: true
 });
 
-function getAllDaysOfMonth(year, month){
-    const lastDayOfMonth = new Date(year, month , 0).getDate();
-    const arr = [];
-    for (let i = 1; i < lastDayOfMonth + 1; i++) {
-        const date = new Date(year, month-1, i);
-        arr.push(`${date.getDate() < 10 ? `0${date.getDate()}`: date.getDate()}.${date.getMonth()+1 < 10 ? `0${date.getMonth()+1}` : date.getMonth()+1}.${date.getFullYear()}`); //Here will print all days
-    }
-    return arr
-}
-
-console.log(getAllDaysOfMonth(2022, 10));
-
 // Handler for dates
 const modal = document.querySelector('.modal');
 
