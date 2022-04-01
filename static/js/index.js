@@ -44,7 +44,16 @@ myApp.setBackground(config.background);
 const countryEl = document.querySelector('#country');
 const countryList = myApp.getCountryList();
 countryList.then(data => countryEl.innerHTML = data.map(el => `<option value="${el.id}">${el.name}</option>`).join('')).catch(console.log);
-//countryList.then(data => console.log(data))
+// countryList.then(data => {
+//     console.log(data);
+//     fetch('/countrySet', {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify({data})
+//     }).then(console.log);
+// });
 
 // Load saved data
 fetch('/getCountryEvents', {

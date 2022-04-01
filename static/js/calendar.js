@@ -208,7 +208,7 @@ const setEvents = async(year) => {
 
             const startDate = {
                 minDay: event.dateStart.day,
-                maxDay: event.dateEnd.month === event.dateStart.month ? event.dateEnd.day : arr.find(month => month.id === event.dateStart.month).days.length,
+                maxDay: event.dateEnd.month === event.dateStart.month ? event.dateEnd.day : arr.find(month => month.id === event.dateStart.month).days.length+1,
                 month: event.dateStart.month,
                 year: event.dateStart.year
             }
@@ -228,11 +228,37 @@ const setEvents = async(year) => {
                 const startDate = dates.startDate;
                 const endDate = dates.endDate;
 
-                if(endDate.year === year) {
+                if(endDate.year === year && startDate.year === year) {
+
+                    for(let i = parseInt(startDate.month)+1; i <= endDate.month; i++) {
+                        months.push(i > 9 ? ''+i : '0'+i);
+                    }
+                    getMonths(months, endDate, arr);
+                    setDays(startDate);
+
+                } else if(endDate.year === year) {
+
                     for(let i = 1; i <= endDate.month; i++) {
                         months.push(i > 9 ? ''+i : '0'+i);
                     }
                     getMonths(months, endDate, arr);
+                    setDays(endDate);
+
+                } else if(startDate.year === year) {
+
+                    for(let i = parseInt(startDate.month)+1; i <= 12; i++) {
+                        months.push(i > 9 ? ''+i : '0'+i);
+                    }
+                    getMonths(months, startDate, arr);
+                    setDays(startDate);
+
+                } else if(year < endDate.year && year > startDate.year ) {
+
+                    for(let i = 1; i <= 12; i++) {
+                        months.push(i > 9 ? ''+i : '0'+i);
+                    }
+                    getMonths(months, startDate, arr);
+
                 }
 
                 for(let i = parseInt(startDate.year); i < endDate.year; i++) {
@@ -242,21 +268,19 @@ const setEvents = async(year) => {
                 console.log(years);
                 console.log(years.includes(parseInt(year)));
 
-                if(years.includes(parseInt(year))) {
+                // if(years.includes(parseInt(year)) && year !== startDate.year && year !== endDate.year) {
+                //
+                //     for(let i = 1; i <= 12; i++) {
+                //         months.push(i > 9 ? ''+i : '0'+i);
+                //     }
+                //
+                //     getMonths(months, startDate, arr);
+                // } else {
+                //     arr.forEach(el => el.days = dayGenerator(getAllDaysOfMonth(year, el.id).length));
+                //     getMonths(months, startDate, arr);
+                // }
 
-                    if(year < endDate.year && year >= startDate.year) {
-                        for(let i = 1; i <= 12; i++) {
-                            months.push(i > 9 ? ''+i : '0'+i);
-                        }
-                    }
 
-                    getMonths(months, startDate, arr);
-                } else if(year === endDate.year) {
-                    setDays(endDate);
-                } else {
-                    arr.forEach(el => el.days = dayGenerator(getAllDaysOfMonth(year, el.id).length));
-                    getMonths(months, startDate, arr);
-                }
 
 
             }

@@ -25,8 +25,6 @@ const hook = async(data, url) => {
     return res.json();
 }
 
-//document.querySelector('.info').textContent = localStorage.getItem('password') ? `Ваш пароль: ${localStorage.getItem('password')}` : '';
-
 document.querySelector('#submitReg').onclick = () => {
     const input = [...reg.querySelectorAll('input')];
     const inputs = input.map(el => el.value);

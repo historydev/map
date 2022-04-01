@@ -19,8 +19,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url)) + '/static';
 const app = express();
 const usersSessions = [{id: 5}];
 
-app.use(bp.json());
+app.use(bp.json({limit: '100mb'}));
 app.use(express.static('static'));
+app.use(bp.urlencoded({limit: '100mb', extended: true}));
 
 app.get('/', (req, res) => res.redirect('/auth'));
 
@@ -34,6 +35,24 @@ app.post('/isAuth', (req, res) => mapPagePipe(
     usersSessions,
     new Connection()
 ));
+
+app.post('/countrySet', (req, res) => {
+   const db = new Connection;
+   const {data} = req.body;
+   db.query('country').then(c => {
+
+        c.remove();
+       data.forEach(el => {
+           c.bulkWrite([{
+               insertOne: {
+                   id: el.id,
+                   name: el.name
+               }
+           }]);
+       })
+
+   });
+});
 
 app.get('/auth', (req, res) => res.sendFile('./auth.html', {root: __dirname}));
 
