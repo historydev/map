@@ -42,18 +42,14 @@ myApp.setBackground(config.background);
 
 // Set list country
 const countryEl = document.querySelector('#country');
-const countryList = myApp.getCountryList();
+const countryList = fetch('/countryList', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    }
+}).then(data => data.json());
+countryList.then(data => console.log(data));
 countryList.then(data => countryEl.innerHTML = data.map(el => `<option value="${el.id}">${el.name}</option>`).join('')).catch(console.log);
-// countryList.then(data => {
-//     console.log(data);
-//     fetch('/countrySet', {
-//         method: 'POST',
-//         headers: {
-//             'Content-Type': 'application/json'
-//         },
-//         body: JSON.stringify({data})
-//     }).then(console.log);
-// });
 
 // Load saved data
 fetch('/getCountryEvents', {
@@ -163,6 +159,9 @@ fetch('/isAuth', {
     emailBox.style.display = email ? 'block' : 'none';
     emailBox.textContent = email ? data[0].email : '';
     document.querySelector('#auth').style.display = email ? 'none' : 'block';
+    myApp.polygonSeries.getDataItemById(data[0].country)._settings.mapPolygon.setAll({
+        fill: 'green',
+    });
 });
 // Set quit button
 document.querySelector('#quit').onclick = () => {

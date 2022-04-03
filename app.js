@@ -36,21 +36,10 @@ app.post('/isAuth', (req, res) => mapPagePipe(
     new Connection()
 ));
 
-app.post('/countrySet', (req, res) => {
+app.post('/countryList', (req, res) => {
    const db = new Connection;
-   const {data} = req.body;
    db.query('country').then(c => {
-
-        c.remove();
-       data.forEach(el => {
-           c.bulkWrite([{
-               insertOne: {
-                   id: el.id,
-                   name: el.name
-               }
-           }]);
-       })
-
+       db.find(c, {}, {}, {name: 1}).then(data => res.send(data));
    });
 });
 

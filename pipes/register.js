@@ -1,6 +1,5 @@
 
 export default function registerPipe(req, res, userSchema, validator, db) {
-    console.log(db);
     db.query('users')
         .then(async collection => {
 
@@ -13,6 +12,8 @@ export default function registerPipe(req, res, userSchema, validator, db) {
                 ...req.body,
                 password: pass
             }
+
+            console.log(currUser);
 
             const user = validator(currUser, userSchema.register);
 

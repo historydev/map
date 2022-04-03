@@ -250,20 +250,20 @@ export class App {
         });
     }
 
-    getCountryList() {
-        return new Promise((resolve, reject) => {
-
-            if(this.polygonSeries.allChildren()) return setTimeout(() => resolve(this.polygonSeries.allChildren()));
-            return reject(new Error('In polygonSeries'));
-
-        })
-        .then(data => data.map(el => el.dataItem).filter(el => !!el))
-        .then(data => data.map(el => el.dataContext).sort((a, b) => {
-            if (a.name > b.name) return 1;
-            if (a.name < b.name) return -1;
-            return 0;
-        })).catch(console.log);
-    }
+    // getCountryList() {
+    //     return new Promise((resolve, reject) => {
+    //
+    //         if(this.polygonSeries.allChildren()) return setTimeout(() => resolve(this.polygonSeries.allChildren()));
+    //         return reject(new Error('In polygonSeries'));
+    //
+    //     })
+    //     .then(data => data.map(el => el.dataItem).filter(el => !!el))
+    //     .then(data => data.map(el => el.dataContext).sort((a, b) => {
+    //         if (a.name > b.name) return 1;
+    //         if (a.name < b.name) return -1;
+    //         return 0;
+    //     })).catch(console.log);
+    // }
 
     setBackground(color) {
 

@@ -16,8 +16,8 @@ export default class Connection {
         return this.collection
     }
 
-    async find(collection, item, options = {}) {
-        return await this.collection.find(item, options).toArray();
+    async find(collection, item, options = {}, sort = {}) {
+        return await this.collection.find(item, options).sort(sort).toArray();
     }
 
 }

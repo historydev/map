@@ -95,11 +95,11 @@ body, html {
     border-bottom: 1px solid rgb(0, 160, 224);
 }
 
-.years .year:hover {
-    background: rgb(0, 160, 224);
-    color: #fff;
-    border: 0;
-}
+/*.years .year:hover {*/
+/*    background: rgb(0, 160, 224);*/
+/*    color: #fff;*/
+/*    border: 0;*/
+/*}*/
 
 .years .year .counter {
     width: 20px;

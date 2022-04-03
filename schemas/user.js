@@ -5,6 +5,7 @@ export default {
         email: 'string',
         date: 'string',
         phone: 'string',
+        country: 'string',
         password: 'string'
     },
     auth: {

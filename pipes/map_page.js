@@ -8,7 +8,8 @@ export default function mapPagePipe(req, res, usersSessions, db) {
         await db.find(collection, {id: id}, {
             projection: {
                 _id: 0,
-                email: 1
+                email: 1,
+                country: 1
             }
         }).then(user => res.send(user));
 

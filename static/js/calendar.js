@@ -317,9 +317,38 @@ const setEvents = async(year) => {
 
 setEvents('2022').then(data => setCalendarData(data));
 
-const yearHandler = () => yearsBox.querySelectorAll('.year').forEach(el => {
+const yearHandler = () => yearsBox.querySelectorAll('.year').forEach((el, i, arr) => {
+    el.state = false;
     el.onclick = () => {
         setEvents(el.querySelector('.title').textContent).then(data => setCalendarData(data));
+        arr.forEach(el => {
+            el.state = false;
+            el.style.background = '';
+            el.style.color = 'rgb(0, 160, 224)';
+            el.querySelector('.counter').style.background = 'rgb(0, 160, 224)';
+            el.querySelector('.counter').style.color = '#fff';
+        });
+        el.state = !el.state;
+        el.style.background = el.state ? 'rgb(0, 160, 224)' : '';
+        el.style.color = el.state ? '#fff' : 'rgb(0, 160, 224)';
+        el.querySelector('.counter').style.background = el.state ? '#fff' : 'rgb(0, 160, 224)';
+        el.querySelector('.counter').style.color = el.state ? 'rgb(0, 160, 224)' : '#fff';
+    }
+
+    el.onmouseover = (e) => {
+        el.style.background = 'rgb(0, 160, 224)';
+        el.style.color = '#fff';
+        el.querySelector('.counter').style.background = '#fff';
+        el.querySelector('.counter').style.color = 'rgb(0, 160, 224)';
+        e.preventDefault();
+    }
+
+    el.onmouseout = (e) => {
+        el.style.background = el.state ? 'rgb(0, 160, 224)' : '';
+        el.style.color = el.state ? '#fff' : 'rgb(0, 160, 224)';
+        el.querySelector('.counter').style.background = el.state ? '#fff' : 'rgb(0, 160, 224)';
+        el.querySelector('.counter').style.color = el.state ? 'rgb(0, 160, 224)' : '#fff';
+        e.preventDefault();
     }
 });
 

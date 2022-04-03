@@ -3,6 +3,17 @@ let formState = false;
 const auth = document.querySelector('#auth');
 const reg = document.querySelector('#register');
 
+// Set list country
+const countryEl = document.querySelector('#country');
+const countryList = fetch('/countryList', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    }
+}).then(data => data.json());
+countryList.then(data => console.log(data));
+countryList.then(data => countryEl.innerHTML = '<option value="0" selected>Select country</option>' + data.map(el => `<option value="${el.id}">${el.name}</option>`).join('')).catch(console.log);
+
 document.querySelectorAll('.changeForm').forEach(el => el.onclick = () => {
     formState = !formState;
     if(formState) {
@@ -33,7 +44,8 @@ document.querySelector('#submitReg').onclick = () => {
             name: inputs[0],
             date: inputs[1],
             email: inputs[2],
-            phone: inputs[3]
+            phone: inputs[3],
+            country: countryEl.value
         }, '/register').then(res => {
             if(res.error) return document.querySelector('.info').textContent = `Ошибка: ${res.error}`;
             input.forEach(el => el.value = '');
