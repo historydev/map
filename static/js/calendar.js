@@ -224,7 +224,6 @@ const setEvents = async(year) => {
 
             const mountDays = (dates) => {
                 const months = [];
-                const years = [];
                 const startDate = dates.startDate;
                 const endDate = dates.endDate;
 
@@ -260,28 +259,6 @@ const setEvents = async(year) => {
                     getMonths(months, startDate, arr);
 
                 }
-
-                for(let i = parseInt(startDate.year); i < endDate.year; i++) {
-                    years.push(i);
-                }
-                console.log(year, endDate.year, startDate.year);
-                console.log(years);
-                console.log(years.includes(parseInt(year)));
-
-                // if(years.includes(parseInt(year)) && year !== startDate.year && year !== endDate.year) {
-                //
-                //     for(let i = 1; i <= 12; i++) {
-                //         months.push(i > 9 ? ''+i : '0'+i);
-                //     }
-                //
-                //     getMonths(months, startDate, arr);
-                // } else {
-                //     arr.forEach(el => el.days = dayGenerator(getAllDaysOfMonth(year, el.id).length));
-                //     getMonths(months, startDate, arr);
-                // }
-
-
-
 
             }
 

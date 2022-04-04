@@ -29,6 +29,8 @@ app.get('/user/:id/calendar', (req, res) => res.sendFile('./calendar.html', {roo
 
 app.get('/user/:id', (req, res) => res.sendFile('./home.html', {root: __dirname}));
 
+app.get('/user/:id/years', (req, res) => res.sendFile('./years.html', {root: __dirname}));
+
 app.post('/isAuth', (req, res) => mapPagePipe(
     req,
     res,

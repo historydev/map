@@ -180,9 +180,6 @@ document.querySelector('#quit').onclick = () => {
     });
 }
 
-document.querySelector('#auth').onclick = () => {
-    window.location.href = '/auth';
-}
-document.querySelector('#calendar').onclick = () => {
-    window.location.pathname = window.location.pathname + '/calendar';
-}
+document.querySelector('#auth').onclick = () => window.location.href = '/auth';
+document.querySelector('#calendar').onclick = () => window.location.pathname = window.location.pathname + '/calendar';
+document.querySelector('#years').onclick = () => window.location.pathname = window.location.pathname + '/years';
