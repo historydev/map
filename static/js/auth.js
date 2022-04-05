@@ -3,6 +3,23 @@ let formState = false;
 const auth = document.querySelector('#auth');
 const reg = document.querySelector('#register');
 
+
+if(localStorage.getItem('email')) {
+    fetch('/isAuth', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            email: localStorage.getItem('email')
+        })
+    }).then(data => data.json()).then(data => {
+        console.log(data);
+        if(!data[0].email) return;
+        window.location.replace(`/user/id${data[0].id}`);
+    });
+}
+
 // Set list country
 const countryEl = document.querySelector('#country');
 const countryList = fetch('/countryList', {

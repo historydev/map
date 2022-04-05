@@ -345,3 +345,4 @@ controlRight.onclick = () => {
 yearHandler();
 
 document.querySelector('#back').onclick = () => window.location.pathname = window.location.pathname.replace('/calendar', '');
+document.querySelector('#years').onclick = () => window.location.pathname = window.location.pathname.replace('/calendar', '/years');

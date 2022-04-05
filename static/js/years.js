@@ -40,7 +40,7 @@ yearsData(userID).then(data => {
 
     });
 
-    yearsBox.insertAdjacentHTML( 'afterbegin', years.map(el => `<div class="year">${el}</div>`).join(''));
+    yearsBox.insertAdjacentHTML( 'afterbegin', years.sort().map(el => `<div class="year">${el}:</div>`).join(''));
 
     yearsBox.querySelectorAll('.year').forEach(el => {
         const years = [];

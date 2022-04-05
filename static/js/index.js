@@ -147,7 +147,7 @@ fetch('/isAuth', {
         'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-        id: +window.location.pathname.replace('/user/id', '')
+        email: localStorage.getItem('email')
     })
 }).then(data => data.json()).then(data => {
     const email = typeof data[0] === typeof {};
