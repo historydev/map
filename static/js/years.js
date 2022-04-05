@@ -28,15 +28,19 @@ const userID = +window.location.pathname.replace('/user/id', '').replace('/years
 yearsData(userID).then(data => {
 
     const yearsBox = document.querySelector('.years');
+    const years = [];
 
-    yearsBox.insertAdjacentHTML( 'afterbegin', data.map(event => {
-        const years = [];
+    data.map(event => {
+
         for(let i = event.start; i <= event.end; i++) {
-            if(event.start !== event.end) years.push(i);
+            if(!years.includes(i)) {
+                years.push(i);
+            }
         }
 
-        return years.map(el => `<div class="year">${el}</div>`).join('');
-    }).join(''));
+    });
+
+    yearsBox.insertAdjacentHTML( 'afterbegin', years.map(el => `<div class="year">${el}</div>`).join(''));
 
     yearsBox.querySelectorAll('.year').forEach(el => {
         const years = [];
@@ -48,9 +52,11 @@ yearsData(userID).then(data => {
             }
         });
 
+        //console.log(years);
+
         years.forEach((year, i) => {
             if(year === parseInt(el.textContent)) {
-                console.log(el.textContent);
+                //console.log(el.textContent);
                 el.insertAdjacentHTML('beforeend', `<div class="flag flag-${names[i]}"></div>`);
             }
         });
